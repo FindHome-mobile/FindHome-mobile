@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <!-- Standalone circular ShapeAppearance (with proper MaterialComponents parent) -->
+    <style name="ShapeAppearance.FinHome.Circle" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <!-- Fallback alias used if some references expect ShapeAppearance.FinHome -->
+    <style name="ShapeAppearance.FinHome" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+
+</resources>

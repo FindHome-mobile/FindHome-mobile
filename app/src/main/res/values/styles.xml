@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme (Material 3) -->
+    <style name="Base.Theme.FinHome" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Sky blue Material 3 color scheme -->
+        <item name="colorPrimary">@color/md_primary</item>
+        <item name="colorOnPrimary">@color/md_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_onPrimaryContainer</item>
+
+        <item name="colorSecondary">@color/md_secondary</item>
+        <item name="colorOnSecondary">@color/md_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_onSecondaryContainer</item>
+
+        <item name="android:colorBackground">@color/md_background</item>
+        <item name="colorSurface">@color/md_surface</item>
+        <item name="colorOnSurface">@color/md_onSurface</item>
+        <item name="colorOnBackground">@color/md_onBackground</item>
+        <item name="colorOutline">@color/md_outline</item>
+    </style>
+
+    <style name="Theme.FinHome" parent="Base.Theme.FinHome" />
+
+    <!-- Backward compatibility: map old AppTheme to new Material3 theme -->
+    <style name="AppTheme" parent="Theme.FinHome" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.Material3.Light" />
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.Material3.ActionBar" />
+
+</resources>

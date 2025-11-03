@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="purple_500">#6200EE</color>
+    <color name="purple_700">#3700B3</color>
+    <color name="teal_200">#03DAC5</color>
+
+    <!-- Sky blue professional palette -->
+    <color name="md_primary">#0EA5E9</color> <!-- Sky 500 -->
+    <color name="md_onPrimary">#FFFFFFFF</color>
+    <color name="md_primaryContainer">#E0F2FE</color> <!-- Sky 100 -->
+    <color name="md_onPrimaryContainer">#0C4A6E</color> <!-- Slate-ish -->
+
+    <color name="md_secondary">#0284C7</color> <!-- Sky 600 -->
+    <color name="md_onSecondary">#FFFFFFFF</color>
+    <color name="md_secondaryContainer">#D3ECFF</color>
+    <color name="md_onSecondaryContainer">#083344</color>
+
+    <color name="md_surface">#F8FAFC</color> <!-- Slate 50 -->
+    <color name="md_onSurface">#0F172A</color> <!-- Slate 900 -->
+    <color name="md_background">#FFFFFFFF</color>
+    <color name="md_onBackground">#0F172A</color>
+    <color name="md_outline">#94A3B8</color> <!-- Slate 400 -->
+
+
+</resources>
