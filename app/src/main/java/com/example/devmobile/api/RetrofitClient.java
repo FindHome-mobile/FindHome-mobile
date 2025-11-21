@@ -62,4 +62,16 @@ public class RetrofitClient {
     public UtilisateurService getUtilisateurService() {
         return retrofit.create(UtilisateurService.class);
     }
+
+    public DemandeProprietaireService getDemandeProprietaireService() {
+        return retrofit.create(DemandeProprietaireService.class);
+    }
+
+    public FavoriService getFavoriService() {
+        return retrofit.create(FavoriService.class);
+    }
+
+    public String getBaseUrl() {
+        return BASE_URL;
+    }
 }

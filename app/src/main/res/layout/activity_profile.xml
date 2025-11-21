@@ -238,6 +238,52 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+                    <!-- Card: Demande Propriétaire -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_demande_proprietaire"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="16dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Devenir Propriétaire"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:layout_marginBottom="12dp"
+                        android:textColor="?attr/colorPrimary"/>
+
+                    <TextView
+                        android:id="@+id/tv_demande_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Faites une demande pour devenir propriétaire et publier des annonces"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="12dp"
+                        android:textColor="?attr/colorOnBackground"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_demande_proprietaire"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Faire une demande"
+                        app:icon="@drawable/edit_24"
+                        app:iconPadding="8dp"
+                        app:iconGravity="textStart"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- Card: Change Password (Sécurité) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"

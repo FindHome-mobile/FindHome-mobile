@@ -1,26 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="160dp"
+    android:layout_height="180dp"
     android:gravity="bottom"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="?attr/colorPrimary">
+    android:padding="24dp"
+    android:background="?attr/colorPrimary"
+    android:backgroundTint="?attr/colorPrimary">
 
-    <TextView
-        android:id="@+id/header_title"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="FinHome"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        android:textColor="?attr/colorOnPrimary" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
 
-    <TextView
-        android:id="@+id/header_subtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Bienvenue"
-        android:textSize="14sp"
-        android:textColor="?attr/colorOnPrimary" />
+        <View
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@android:drawable/ic_menu_myplaces"
+            android:backgroundTint="?attr/colorOnPrimary"
+            android:padding="8dp"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp">
+
+            <TextView
+                android:id="@+id/header_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FinHome"
+                android:textStyle="bold"
+                android:textSize="24sp"
+                android:textColor="?attr/colorOnPrimary"
+                android:letterSpacing="0.02"/>
+
+            <TextView
+                android:id="@+id/header_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bienvenue"
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnPrimary"
+                android:alpha="0.9"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

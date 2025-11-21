@@ -102,9 +102,25 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         // Adapter les champs au backend: nom, prenom, email, motDePasse, type (+ proprietaire fields)
-        String[] parts = name.split(" ", 2);
-        String nom = parts.length > 0 ? parts[0] : name;
-        String prenom = parts.length > 1 ? parts[1] : "";
+        // Si l'utilisateur entre un seul nom (ex: "hazem"), on le met dans nom et prenom
+        // Si l'utilisateur entre deux mots (ex: "hazem ben", on divise en nom et prenom
+        String[] parts = name.trim().split("\\s+", 2);
+        String nom;
+        String prenom;
+        
+        if (parts.length == 1) {
+            // Un seul mot: on le met dans nom et prenom (le backend exige les deux)
+            nom = parts[0];
+            prenom = parts[0]; // Même valeur pour les deux
+        } else if (parts.length == 2) {
+            // Deux mots: premier = nom, deuxième = prenom
+            nom = parts[0];
+            prenom = parts[1];
+        } else {
+            // Par défaut (ne devrait pas arriver)
+            nom = name;
+            prenom = name;
+        }
 
         // Construire le corps JSON exactement comme l'exemple backend
         JsonObject body = new JsonObject();
@@ -119,26 +135,90 @@ public class RegisterActivity extends AppCompatActivity {
             body.addProperty("location", location);
         }
 
+        // Désactiver le bouton pour éviter les doubles clics
+        btnRegister.setEnabled(false);
+        
         // Appel de l'API d'enregistrement (JSON)
+        Log.d("RegisterActivity", "Envoi de l'inscription: " + body.toString());
         Call<User> call = authService.registerUser(body);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
+                btnRegister.setEnabled(true);
+                Log.d("RegisterActivity", "Réponse inscription: " + response.code());
+                
                 if (response.isSuccessful() && response.body() != null) {
                     User user = response.body();
-                    Toast.makeText(RegisterActivity.this, "Compte créé! Veuillez vous connecter.", Toast.LENGTH_LONG).show();
-                    // Optionnel: Connexion automatique ou retour à l'écran de connexion
+                    Log.d("RegisterActivity", "Inscription réussie pour: " + user.getEmail());
+                    Toast.makeText(RegisterActivity.this, "Compte créé avec succès! Veuillez vous connecter.", Toast.LENGTH_LONG).show();
+                    // Retour à l'écran de connexion
                     finish();
                 } else {
                     Log.e("API_ERROR", "Registration failed: " + response.code());
-                    Toast.makeText(RegisterActivity.this, "Échec de l'enregistrement. Email peut-être déjà utilisé.", Toast.LENGTH_LONG).show();
+                    String errorMsg = "Échec de l'enregistrement";
+                    try {
+                        if (response.errorBody() != null) {
+                            String errorBody = response.errorBody().string();
+                            Log.e("RegisterActivity", "Erreur body: " + errorBody);
+                            
+                            // Essayer d'extraire le message d'erreur du JSON
+                            if (errorBody.contains("\"message\"")) {
+                                int start = errorBody.indexOf("\"message\"");
+                                if (start != -1) {
+                                    int msgStart = errorBody.indexOf("\"", start + 10) + 1;
+                                    int msgEnd = errorBody.indexOf("\"", msgStart);
+                                    if (msgEnd > msgStart) {
+                                        errorMsg = errorBody.substring(msgStart, msgEnd);
+                                    }
+                                }
+                            } else if (errorBody.contains("message")) {
+                                // Format alternatif
+                                int start = errorBody.indexOf("message");
+                                if (start != -1) {
+                                    int msgStart = errorBody.indexOf(":", start) + 1;
+                                    int msgEnd = errorBody.indexOf(",", msgStart);
+                                    if (msgEnd == -1) msgEnd = errorBody.indexOf("}", msgStart);
+                                    if (msgEnd > msgStart) {
+                                        String msg = errorBody.substring(msgStart, msgEnd).trim();
+                                        if (msg.startsWith("\"")) msg = msg.substring(1);
+                                        if (msg.endsWith("\"")) msg = msg.substring(0, msg.length() - 1);
+                                        errorMsg = msg;
+                                    }
+                                }
+                            }
+                            
+                            // Messages spécifiques selon le code
+                            if (response.code() == 400) {
+                                if (errorMsg.contains("déjà") || errorMsg.contains("existe")) {
+                                    errorMsg = "Cet email est déjà utilisé. Veuillez utiliser un autre email.";
+                                }
+                            } else if (response.code() == 500) {
+                                errorMsg = "Erreur serveur. Veuillez réessayer plus tard.";
+                            }
+                        }
+                    } catch (Exception e) {
+                        Log.e("RegisterActivity", "Erreur parsing: " + e.getMessage());
+                        if (response.code() == 400) {
+                            errorMsg = "Données invalides. Vérifiez vos informations.";
+                        }
+                    }
+                    Toast.makeText(RegisterActivity.this, errorMsg, Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-                Log.e("NETWORK_ERROR", "Registration failed: " + t.getMessage());
-                Toast.makeText(RegisterActivity.this, "Erreur réseau. Impossible de se connecter au serveur.", Toast.LENGTH_LONG).show();
+                btnRegister.setEnabled(true);
+                Log.e("NETWORK_ERROR", "Registration failed: " + t.getMessage(), t);
+                String errorMsg = "Erreur réseau";
+                if (t.getMessage() != null) {
+                    if (t.getMessage().contains("Failed to connect") || t.getMessage().contains("Unable to resolve host")) {
+                        errorMsg = "Impossible de se connecter au serveur. Vérifiez votre connexion internet.";
+                    } else {
+                        errorMsg = "Erreur réseau: " + t.getMessage();
+                    }
+                }
+                Toast.makeText(RegisterActivity.this, errorMsg, Toast.LENGTH_LONG).show();
             }
         });
     }

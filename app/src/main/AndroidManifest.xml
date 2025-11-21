@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:allowBackup="true"
@@ -37,6 +38,18 @@
 
         <activity
             android:name="com.example.devmobile.ListingsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="com.example.devmobile.AdminActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="com.example.devmobile.AnnonceDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="com.example.devmobile.CreateAnnonceActivity"
             android:exported="false" />
 
 

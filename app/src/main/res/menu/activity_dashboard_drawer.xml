@@ -2,6 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/nav_home" android:title="Accueil" />
     <item android:id="@+id/nav_profile" android:title="Profil" />
+    <item android:id="@+id/nav_create_annonce" android:title="Créer une annonce" android:visible="false" />
+    <item android:id="@+id/nav_admin" android:title="Gestion des demandes" android:visible="false" />
     <item android:id="@+id/nav_settings" android:title="Paramètres" />
     <item android:id="@+id/nav_logout" android:title="Déconnexion" />
 </menu>
