@@ -1,26 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="160dp"
+    android:layout_height="200dp"
     android:gravity="bottom"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="?attr/colorPrimary">
+    android:padding="24dp"
+    android:background="@drawable/nav_header_gradient"
+    android:theme="@style/ThemeOverlay.Material3.Dark">
 
+    <!-- App Logo -->
+    <ImageView
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/ic_app_logo"
+        android:contentDescription="App Logo"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- App Title -->
     <TextView
         android:id="@+id/header_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="FinHome"
+        android:text="FindHome"
         android:textStyle="bold"
-        android:textSize="20sp"
-        android:textColor="?attr/colorOnPrimary" />
+        android:textSize="28sp"
+        android:textColor="@android:color/white"
+        android:letterSpacing="0.02"
+        android:fontFamily="sans-serif-medium"/>
 
+    <!-- Subtitle -->
     <TextView
         android:id="@+id/header_subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bienvenue"
+        android:text="Trouvez votre maison idéale"
         android:textSize="14sp"
-        android:textColor="?attr/colorOnPrimary" />
+        android:textColor="@android:color/white"
+        android:alpha="0.9"
+        android:layout_marginTop="4dp"/>
 </LinearLayout>

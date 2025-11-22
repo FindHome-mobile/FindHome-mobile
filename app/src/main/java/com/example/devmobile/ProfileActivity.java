@@ -15,8 +15,13 @@ import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.example.devmobile.api.RetrofitClient;
 import com.example.devmobile.api.UtilisateurService;
+import com.example.devmobile.api.DemandeProprietaireService;
 import com.example.devmobile.models.User;
+import com.example.devmobile.models.DemandeProprietaire;
+import com.example.devmobile.models.DemandeResponse;
 import com.google.gson.JsonObject;
+
+import androidx.annotation.NonNull;
 
 import com.google.android.material.imageview.ShapeableImageView;
 import java.io.ByteArrayOutputStream;
@@ -40,15 +45,23 @@ public class ProfileActivity extends AppCompatActivity {
     private ShapeableImageView profileImage;
     private EditText etPrenom, etNom, etEmail, etPhone, etLocation, etFacebook;
     private View btnSave, btnCancel, btnChangePhoto, btnChangePassword;
+    private com.google.android.material.button.MaterialButton btnDemandeProprietaire;
     private EditText etCurrentPassword, etNewPassword, etConfirmPassword;
+    private android.view.View cardDemandeProprietaire;
+    private android.widget.TextView tvDemandeStatus;
     private UtilisateurService utilisateurService;
+    private DemandeProprietaireService demandeProprietaireService;
     private String userId;
+    private String userType;
     private ActivityResultLauncher<String> imagePickerLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        // Initialiser le contexte pour Retrofit
+        RetrofitClient.setContext(this);
 
         // Configuration de la barre d'outils
         Toolbar toolbar = findViewById(R.id.toolbar_profile);
@@ -75,11 +88,16 @@ public class ProfileActivity extends AppCompatActivity {
         etCurrentPassword = findViewById(R.id.et_current_password);
         etNewPassword = findViewById(R.id.et_new_password);
         etConfirmPassword = findViewById(R.id.et_confirm_password);
+        cardDemandeProprietaire = findViewById(R.id.card_demande_proprietaire);
+        btnDemandeProprietaire = findViewById(R.id.btn_demande_proprietaire);
+        tvDemandeStatus = findViewById(R.id.tv_demande_status);
 
         utilisateurService = RetrofitClient.getInstance().getUtilisateurService();
+        demandeProprietaireService = RetrofitClient.getInstance().getDemandeProprietaireService();
 
         SharedPreferences prefs = getSharedPreferences("AuthPrefs", MODE_PRIVATE);
         userId = prefs.getString("USER_ID", null);
+        userType = prefs.getString("USER_TYPE", "client");
         String nom = prefs.getString("USER_NOM", "");
         String prenom = prefs.getString("USER_PRENOM", "");
         String email = prefs.getString("USER_EMAIL", "");
@@ -109,6 +127,7 @@ public class ProfileActivity extends AppCompatActivity {
         setupImagePicker();
         btnChangePhoto.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
         btnChangePassword.setOnClickListener(v -> changePassword());
+        btnDemandeProprietaire.setOnClickListener(v -> createDemandeProprietaire());
     }
 
     private void loadUserFromBackend(String id) {
@@ -117,13 +136,15 @@ public class ProfileActivity extends AppCompatActivity {
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     User u = response.body();
+                    userType = u.getType();
                     tvName.setText((u.getNom() + " " + u.getPrenom()).trim());
                     tvEmail.setText(u.getEmail());
                     etNom.setText(u.getNom());
                     etPrenom.setText(u.getPrenom());
                     etEmail.setText(u.getEmail());
                     etLocation.setText(u.getLocation());
-                    // etPhone, etFacebook non retournés dans User model actuel; laissés vides
+                    if (u.getNumTel() != null) etPhone.setText(u.getNumTel());
+                    if (u.getFacebook() != null) etFacebook.setText(u.getFacebook());
 
                     // Photo: prefer base64 if provided; else ignore (could handle URL with an image loader)
                     if (!TextUtils.isEmpty(u.getPhotoDeProfile())) {
@@ -137,8 +158,12 @@ public class ProfileActivity extends AppCompatActivity {
                             .putString("USER_PRENOM", u.getPrenom())
                             .putString("USER_EMAIL", u.getEmail())
                             .putString("USER_LOCATION", u.getLocation())
+                            .putString("USER_TYPE", u.getType())
                             .putString("USER_PHOTO_BASE64", u.getPhotoDeProfile())
                             .apply();
+
+                    // Gérer l'affichage de la demande de propriétaire
+                    checkDemandeProprietaire();
                 } else {
                     Toast.makeText(ProfileActivity.this, "Impossible de charger le profil", Toast.LENGTH_LONG).show();
                 }
@@ -312,6 +337,151 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
                 Toast.makeText(ProfileActivity.this, "Erreur réseau: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void checkDemandeProprietaire() {
+        if ("client".equals(userType)) {
+            cardDemandeProprietaire.setVisibility(android.view.View.VISIBLE);
+            demandeProprietaireService.getDemandeByUtilisateur(userId).enqueue(new Callback<DemandeProprietaire>() {
+                @Override
+                public void onResponse(Call<DemandeProprietaire> call, Response<DemandeProprietaire> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        DemandeProprietaire demande = response.body();
+                        String statut = demande.getStatut();
+                        if ("en_attente".equals(statut)) {
+                            tvDemandeStatus.setText("Votre demande est en attente d'approbation");
+                            btnDemandeProprietaire.setEnabled(false);
+                            btnDemandeProprietaire.setText("Demande en attente");
+                        } else if ("approuvee".equals(statut)) {
+                            tvDemandeStatus.setText("Votre demande a été approuvée ! Vous êtes maintenant propriétaire.");
+                            btnDemandeProprietaire.setEnabled(false);
+                            btnDemandeProprietaire.setText("Demande approuvée");
+                        } else if ("rejetee".equals(statut)) {
+                            tvDemandeStatus.setText("Votre demande a été rejetée. Vous pouvez faire une nouvelle demande.");
+                            btnDemandeProprietaire.setEnabled(true);
+                            btnDemandeProprietaire.setText("Faire une nouvelle demande");
+                        }
+                    } else {
+                        // Pas de demande existante
+                        tvDemandeStatus.setText("Faites une demande pour devenir propriétaire et publier des annonces");
+                        btnDemandeProprietaire.setEnabled(true);
+                        btnDemandeProprietaire.setText("Faire une demande");
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<DemandeProprietaire> call, Throwable t) {
+                    // Pas de demande existante ou erreur
+                    tvDemandeStatus.setText("Faites une demande pour devenir propriétaire et publier des annonces");
+                    btnDemandeProprietaire.setEnabled(true);
+                    btnDemandeProprietaire.setText("Faire une demande");
+                }
+            });
+        } else {
+            cardDemandeProprietaire.setVisibility(android.view.View.GONE);
+        }
+    }
+
+    private void createDemandeProprietaire() {
+        if (TextUtils.isEmpty(userId)) {
+            Toast.makeText(this, "Utilisateur non connecté", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Désactiver le bouton pour éviter les doubles clics
+        btnDemandeProprietaire.setEnabled(false);
+        btnDemandeProprietaire.setText("Création en cours...");
+
+        android.util.Log.d("ProfileActivity", "Création demande pour utilisateur: " + userId);
+        android.util.Log.d("ProfileActivity", "URL complète: " + RetrofitClient.getInstance().getBaseUrl() + "demandes-proprietaire");
+        
+        JsonObject body = new JsonObject();
+        body.addProperty("utilisateurId", userId);
+        android.util.Log.d("ProfileActivity", "Body: " + body.toString());
+
+        demandeProprietaireService.createDemande(body).enqueue(new Callback<DemandeResponse>() {
+            @Override
+            public void onResponse(Call<DemandeResponse> call, Response<DemandeResponse> response) {
+                android.util.Log.d("ProfileActivity", "Réponse demande: " + response.code());
+                android.util.Log.d("ProfileActivity", "Headers: " + response.headers());
+                
+                if (response.isSuccessful() && response.body() != null) {
+                    DemandeResponse demandeResponse = response.body();
+                    String message = demandeResponse.getMessage() != null ? demandeResponse.getMessage() : "Demande créée avec succès !";
+                    Toast.makeText(ProfileActivity.this, message, Toast.LENGTH_LONG).show();
+                    checkDemandeProprietaire();
+                } else {
+                    String errorMsg = "Erreur " + response.code();
+                    try {
+                        if (response.errorBody() != null) {
+                            String errorBody = response.errorBody().string();
+                            android.util.Log.e("ProfileActivity", "Erreur body complet: " + errorBody);
+                            
+                            // Essayer de parser le JSON
+                            if (errorBody.contains("\"message\"")) {
+                                int start = errorBody.indexOf("\"message\"");
+                                if (start != -1) {
+                                    int msgStart = errorBody.indexOf("\"", start + 10) + 1;
+                                    int msgEnd = errorBody.indexOf("\"", msgStart);
+                                    if (msgEnd > msgStart) {
+                                        errorMsg = errorBody.substring(msgStart, msgEnd);
+                                    }
+                                }
+                            } else if (errorBody.contains("message")) {
+                                // Format alternatif
+                                int start = errorBody.indexOf("message");
+                                if (start != -1) {
+                                    int msgStart = errorBody.indexOf(":", start) + 1;
+                                    int msgEnd = errorBody.indexOf(",", msgStart);
+                                    if (msgEnd == -1) msgEnd = errorBody.indexOf("}", msgStart);
+                                    if (msgEnd > msgStart) {
+                                        String msg = errorBody.substring(msgStart, msgEnd).trim();
+                                        if (msg.startsWith("\"")) msg = msg.substring(1);
+                                        if (msg.endsWith("\"")) msg = msg.substring(0, msg.length() - 1);
+                                        errorMsg = msg;
+                                    }
+                                }
+                            }
+                            
+                            if (response.code() == 404) {
+                                errorMsg = "Endpoint non trouvé. Vérifiez que le backend est démarré sur le port 5000.";
+                            } else if (response.code() == 400) {
+                                // Erreur de validation - garder le message du serveur
+                            } else {
+                                errorMsg = "Erreur " + response.code() + ": " + (errorMsg.length() > 50 ? errorMsg.substring(0, 50) : errorMsg);
+                            }
+                        }
+                    } catch (Exception e) {
+                        android.util.Log.e("ProfileActivity", "Erreur parsing: " + e.getMessage(), e);
+                        if (response.code() == 404) {
+                            errorMsg = "Endpoint non trouvé (404). Vérifiez que le backend est démarré.";
+                        }
+                    }
+                    Toast.makeText(ProfileActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+                    btnDemandeProprietaire.setEnabled(true);
+                    btnDemandeProprietaire.setText("Faire une demande");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DemandeResponse> call, Throwable t) {
+                android.util.Log.e("ProfileActivity", "Erreur réseau complète", t);
+                String errorMsg = "Erreur réseau";
+                if (t.getMessage() != null) {
+                    android.util.Log.e("ProfileActivity", "Message d'erreur: " + t.getMessage());
+                    if (t.getMessage().contains("404") || t.getMessage().contains("Not Found")) {
+                        errorMsg = "Endpoint non trouvé (404). Vérifiez que:\n1. Le backend est démarré\n2. L'URL est correcte: " + RetrofitClient.getInstance().getBaseUrl();
+                    } else if (t.getMessage().contains("Failed to connect") || t.getMessage().contains("Unable to resolve host")) {
+                        errorMsg = "Impossible de se connecter au serveur.\nVérifiez l'URL: " + RetrofitClient.getInstance().getBaseUrl();
+                    } else {
+                        errorMsg = "Erreur: " + t.getMessage();
+                    }
+                }
+                Toast.makeText(ProfileActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+                btnDemandeProprietaire.setEnabled(true);
+                btnDemandeProprietaire.setText("Faire une demande");
             }
         });
     }

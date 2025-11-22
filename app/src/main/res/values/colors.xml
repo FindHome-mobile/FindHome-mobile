@@ -7,22 +7,50 @@
     <color name="purple_700">#3700B3</color>
     <color name="teal_200">#03DAC5</color>
 
-    <!-- Sky blue professional palette -->
-    <color name="md_primary">#0EA5E9</color> <!-- Sky 500 -->
-    <color name="md_onPrimary">#FFFFFFFF</color>
-    <color name="md_primaryContainer">#E0F2FE</color> <!-- Sky 100 -->
-    <color name="md_onPrimaryContainer">#0C4A6E</color> <!-- Slate-ish -->
+    <!-- Modern Professional Color Palette - Deep Blue & Warm Gray Theme -->
+    <color name="md_primary">#1E40AF</color> <!-- Deep Blue 600 -->
+    <color name="md_onPrimary">#FFFFFF</color>
+    <color name="md_primaryContainer">#DBEAFE</color> <!-- Blue 50 -->
+    <color name="md_onPrimaryContainer">#1E3A8A</color> <!-- Blue 800 -->
 
-    <color name="md_secondary">#0284C7</color> <!-- Sky 600 -->
-    <color name="md_onSecondary">#FFFFFFFF</color>
-    <color name="md_secondaryContainer">#D3ECFF</color>
-    <color name="md_onSecondaryContainer">#083344</color>
+    <color name="md_secondary">#7C3AED</color> <!-- Violet 600 -->
+    <color name="md_onSecondary">#FFFFFF</color>
+    <color name="md_secondaryContainer">#F3E8FF</color> <!-- Violet 50 -->
+    <color name="md_onSecondaryContainer">#581C87</color> <!-- Violet 800 -->
 
-    <color name="md_surface">#F8FAFC</color> <!-- Slate 50 -->
-    <color name="md_onSurface">#0F172A</color> <!-- Slate 900 -->
-    <color name="md_background">#FFFFFFFF</color>
-    <color name="md_onBackground">#0F172A</color>
-    <color name="md_outline">#94A3B8</color> <!-- Slate 400 -->
+    <color name="md_tertiary">#059669</color> <!-- Emerald 600 -->
+    <color name="md_onTertiary">#FFFFFF</color>
+    <color name="md_tertiaryContainer">#ECFDF5</color> <!-- Emerald 50 -->
+    <color name="md_onTertiaryContainer">#064E3B</color> <!-- Emerald 800 -->
 
+    <color name="md_error">#DC2626</color> <!-- Red 600 -->
+    <color name="md_onError">#FFFFFF</color>
+    <color name="md_errorContainer">#FEF2F2</color> <!-- Red 50 -->
+    <color name="md_onErrorContainer">#991B1B</color> <!-- Red 800 -->
+
+    <color name="md_surface">#FAFAFA</color> <!-- Warm Gray 50 -->
+    <color name="md_onSurface">#1F2937</color> <!-- Gray 800 -->
+    <color name="md_surfaceVariant">#F9FAFB</color> <!-- Gray 50 -->
+    <color name="md_onSurfaceVariant">#6B7280</color> <!-- Gray 500 -->
+
+    <color name="md_background">#FFFFFF</color>
+    <color name="md_onBackground">#111827</color> <!-- Gray 900 -->
+    <color name="md_outline">#D1D5DB</color> <!-- Gray 300 -->
+    <color name="md_outlineVariant">#E5E7EB</color> <!-- Gray 200 -->
+
+    <!-- Custom accent colors for modern design -->
+    <color name="accent_success">#10B981</color> <!-- Emerald 500 -->
+    <color name="accent_warning">#F59E0B</color> <!-- Amber 500 -->
+    <color name="accent_info">#3B82F6</color> <!-- Blue 500 -->
+
+    <!-- Gradient colors for modern effects -->
+    <color name="gradient_start">#1E40AF</color>
+    <color name="gradient_middle">#3B82F6</color>
+    <color name="gradient_end">#60A5FA</color>
+
+    <!-- Shadow colors -->
+    <color name="shadow_light">#1F2937</color>
+    <color name="shadow_medium">#374151</color>
+    <color name="shadow_dark">#111827</color>
 
 </resources>

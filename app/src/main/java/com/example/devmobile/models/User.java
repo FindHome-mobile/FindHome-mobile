@@ -23,6 +23,10 @@ public class User {
     private String photoUrl;
     @SerializedName("location")
     private String location;
+    @SerializedName("numTel")
+    private String numTel;
+    @SerializedName("facebook")
+    private String facebook;
 
     // Constructeur
     public User(String id, String nom, String prenom, String email, String type, String photoDeProfile, String photoUrl, String location) {
@@ -45,4 +49,9 @@ public class User {
     public String getPhotoDeProfile() { return photoDeProfile; }
     public String getPhotoUrl() { return photoUrl; }
     public String getLocation() { return location; }
+    public String getNumTel() { return numTel; }
+    public String getFacebook() { return facebook; }
+    
+    public void setNumTel(String numTel) { this.numTel = numTel; }
+    public void setFacebook(String facebook) { this.facebook = facebook; }
 }

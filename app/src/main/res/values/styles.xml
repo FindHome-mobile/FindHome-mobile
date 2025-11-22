@@ -3,7 +3,7 @@
 
     <!-- Base application theme (Material 3) -->
     <style name="Base.Theme.FinHome" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Sky blue Material 3 color scheme -->
+        <!-- Modern Professional Color Scheme -->
         <item name="colorPrimary">@color/md_primary</item>
         <item name="colorOnPrimary">@color/md_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_primaryContainer</item>
@@ -14,11 +14,29 @@
         <item name="colorSecondaryContainer">@color/md_secondaryContainer</item>
         <item name="colorOnSecondaryContainer">@color/md_onSecondaryContainer</item>
 
+        <item name="colorTertiary">@color/md_tertiary</item>
+        <item name="colorOnTertiary">@color/md_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/md_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/md_onTertiaryContainer</item>
+
+        <item name="colorError">@color/md_error</item>
+        <item name="colorOnError">@color/md_onError</item>
+        <item name="colorErrorContainer">@color/md_errorContainer</item>
+        <item name="colorOnErrorContainer">@color/md_onErrorContainer</item>
+
         <item name="android:colorBackground">@color/md_background</item>
+        <item name="colorBackground">@color/md_background</item>
         <item name="colorSurface">@color/md_surface</item>
+        <item name="colorSurfaceVariant">@color/md_surfaceVariant</item>
         <item name="colorOnSurface">@color/md_onSurface</item>
+        <item name="colorOnSurfaceVariant">@color/md_onSurfaceVariant</item>
         <item name="colorOnBackground">@color/md_onBackground</item>
         <item name="colorOutline">@color/md_outline</item>
+        <item name="colorOutlineVariant">@color/md_outlineVariant</item>
+
+        <!-- Modern elevation and shadow effects -->
+        <!-- Note: Content transitions disabled for API 24 compatibility -->
+        <!-- <item name="android:windowContentTransitions">true</item> -->
     </style>
 
     <style name="Theme.FinHome" parent="Base.Theme.FinHome" />

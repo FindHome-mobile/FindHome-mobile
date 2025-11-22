@@ -1,8 +1,11 @@
 package com.example.devmobile.api;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import java.util.concurrent.TimeUnit;
 
@@ -17,6 +20,12 @@ public class RetrofitClient {
 
     private static RetrofitClient instance;
     private Retrofit retrofit;
+    private Context context;
+
+    public static void setContext(Context ctx) {
+        instance = null; // Reset instance to recreate with context
+        getInstance().context = ctx;
+    }
 
     private RetrofitClient() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
@@ -26,6 +35,27 @@ public class RetrofitClient {
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
+                .addInterceptor(chain -> {
+                    Request original = chain.request();
+                    Request.Builder requestBuilder = original.newBuilder();
+
+                    // Ajouter l'authentification si disponible
+                    if (context != null) {
+                        SharedPreferences prefs = context.getSharedPreferences("AuthPrefs", Context.MODE_PRIVATE);
+                        String userId = prefs.getString("USER_ID", null);
+                        if (userId != null && !userId.isEmpty()) {
+                            requestBuilder.addHeader("user-id", userId);
+                            android.util.Log.d("RetrofitClient", "Ajout header user-id: " + userId + " pour URL: " + original.url());
+                        } else {
+                            android.util.Log.w("RetrofitClient", "user-id non trouvé dans SharedPreferences");
+                        }
+                    } else {
+                        android.util.Log.w("RetrofitClient", "Context null, impossible d'ajouter user-id");
+                    }
+
+                    Request request = requestBuilder.build();
+                    return chain.proceed(request);
+                })
                 .addInterceptor(logging)
                 .build();
 
@@ -61,5 +91,17 @@ public class RetrofitClient {
 
     public UtilisateurService getUtilisateurService() {
         return retrofit.create(UtilisateurService.class);
+    }
+
+    public DemandeProprietaireService getDemandeProprietaireService() {
+        return retrofit.create(DemandeProprietaireService.class);
+    }
+
+    public FavoriService getFavoriService() {
+        return retrofit.create(FavoriService.class);
+    }
+
+    public String getBaseUrl() {
+        return BASE_URL;
     }
 }

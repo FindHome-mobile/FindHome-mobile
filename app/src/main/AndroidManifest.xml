@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:allowBackup="true"
@@ -15,13 +16,17 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.FinHome">
         <activity
-            android:name="com.example.devmobile.LoginActivity"
+            android:name="com.example.devmobile.WelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.example.devmobile.LoginActivity"
+            android:exported="false" />
 
         <activity
             android:name="com.example.devmobile.RegisterActivity"
@@ -39,6 +44,25 @@
             android:name="com.example.devmobile.ListingsActivity"
             android:exported="false" />
 
+        <activity
+            android:name="com.example.devmobile.AdminActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="com.example.devmobile.AnnonceDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="com.example.devmobile.CreateAnnonceActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="com.example.devmobile.FavoritesActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="com.example.devmobile.MyAnnoncesActivity"
+            android:exported="false" />
 
     </application>
 
