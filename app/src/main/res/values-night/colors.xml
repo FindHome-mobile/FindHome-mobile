@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="purple_500">#BB86FC</color>
+    <color name="purple_700">#3700B3</color>
+    <color name="teal_200">#03DAC5</color>
+
+    <!-- Modern Professional Color Palette - Dark Theme -->
+    <!-- Primary: Softer Blue palette for elegant dark mode -->
+    <color name="md_primary">#7CA5F6</color> <!-- Softer blue -->
+    <color name="md_onPrimary">#0F1729</color> <!-- Very dark blue for text on primary -->
+    <color name="md_primaryContainer">#1E3968</color> <!-- Dark blue container -->
+    <color name="md_onPrimaryContainer">#C3D9FF</color> <!-- Light blue text -->
+
+    <!-- Secondary: Elegant Purple -->
+    <color name="md_secondary">#B39DDB</color> <!-- Softer violet -->
+    <color name="md_onSecondary">#1A1625</color> <!-- Very dark for text -->
+    <color name="md_secondaryContainer">#3E2F5B</color> <!-- Dark purple container -->
+    <color name="md_onSecondaryContainer">#E1D5FF</color> <!-- Light purple text -->
+
+    <!-- Tertiary: Fresh Mint Green -->
+    <color name="md_tertiary">#6DD19C</color> <!-- Softer emerald -->
+    <color name="md_onTertiary">#0D2318</color> <!-- Very dark green -->
+    <color name="md_tertiaryContainer">#1B4D3E</color> <!-- Dark green container -->
+    <color name="md_onTertiaryContainer">#CCFFE5</color> <!-- Light green text -->
+
+    <!-- Error -->
+    <color name="md_error">#FCA5A5</color> <!-- Red 300 -->
+    <color name="md_onError">#7F1D1D</color> <!-- Red 900 -->
+    <color name="md_errorContainer">#991B1B</color> <!-- Red 800 -->
+    <color name="md_onErrorContainer">#FEE2E2</color> <!-- Red 100 -->
+
+    <!-- Surface & Background - Softer, more premium dark -->
+    <color name="md_surface">#1E1E2E</color> <!-- Deep blue-gray for cards -->
+    <color name="md_onSurface">#E5E7EB</color> <!-- Softer white for better readability -->
+    <color name="md_surfaceVariant">#2A2A3A</color> <!-- Slightly lighter variant -->
+    <color name="md_onSurfaceVariant">#C4C7D0</color> <!-- Medium gray for secondary text -->
+
+    <color name="md_background">#0F0F1A</color> <!-- Very dark blue-black for main background -->
+    <color name="md_onBackground">#E5E7EB</color> <!-- Softer white for main text -->
+    <color name="md_outline">#4F5563</color> <!-- More visible outlines -->
+    <color name="md_outlineVariant">#2D3140</color> <!-- Subtle borders -->
+
+    <!-- Custom accent colors for modern design - more saturated for dark mode -->
+    <color name="accent_success">#4ADE80</color> <!-- Brighter green for visibility -->
+    <color name="accent_warning">#FBBF24</color> <!-- Warm amber -->
+    <color name="accent_info">#67B7FF</color> <!-- Brighter blue -->
+
+    <!-- Gradient colors for modern effects - deeper, richer -->
+    <color name="gradient_start">#1A2847</color> <!-- Deep navy -->
+    <color name="gradient_middle">#2D4A7C</color> <!-- Rich blue -->
+    <color name="gradient_end">#4A6FA5</color> <!-- Medium blue -->
+
+    <!-- Shadow colors -->
+    <color name="shadow_light">#000000</color>
+    <color name="shadow_medium">#000000</color>
+    <color name="shadow_dark">#000000</color>
+
+</resources>

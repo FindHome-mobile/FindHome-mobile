@@ -41,8 +41,10 @@ import retrofit2.Response;
 
 public class CreateAnnonceActivity extends AppCompatActivity {
 
-    private EditText etTitre, etDescription, etLocalisation, etPrix, etNbPieces, etSurface, etTypeBien;
-    private android.widget.CheckBox cbMeublee, cbAscenseur, cbParking, cbClimatisation, cbChauffage, cbBalcon, cbJardin, cbPiscine;
+    private EditText etTitre, etDescription, etLocalisation, etPrix, etNbPieces, etSurface;
+    private android.widget.AutoCompleteTextView etTypeBien;
+    private android.widget.CheckBox cbMeublee, cbAscenseur, cbParking, cbClimatisation, cbChauffage, cbBalcon, cbJardin,
+            cbPiscine;
     private EditText etEtage, etTelephone;
     private View btnCreate;
     private ProgressBar progressBar;
@@ -92,7 +94,8 @@ public class CreateAnnonceActivity extends AppCompatActivity {
         }
 
         initViews();
-        
+        setupTypeBienDropdown();
+
         // Pré-remplir le téléphone si disponible
         if (etTelephone != null) {
             if (!TextUtils.isEmpty(userPhone)) {
@@ -104,13 +107,32 @@ public class CreateAnnonceActivity extends AppCompatActivity {
         } else {
             android.util.Log.e("CreateAnnonce", "etTelephone est null après initViews");
         }
-        
+
         annonceService = RetrofitClient.getInstance().getAnnonceService();
         setupImagePicker();
 
         // Si on est en mode édition, charger les données de l'annonce
         if (isEditing && annonceId != null) {
             loadAnnonceData(annonceId);
+        }
+    }
+
+    private void setupTypeBienDropdown() {
+        if (etTypeBien != null) {
+            String[] types = new String[] { "Appartement", "Maison", "Villa", "Studio", "Terrain", "Bureau",
+                    "Local Commercial" };
+            android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<>(
+                    this, android.R.layout.simple_dropdown_item_1line, types);
+            etTypeBien.setAdapter(adapter);
+            etTypeBien.setThreshold(1); // Commencer à suggérer dès le premier caractère si l'utilisateur tape
+
+            // Ouvrir le dropdown au clic
+            etTypeBien.setOnClickListener(v -> etTypeBien.showDropDown());
+            etTypeBien.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus) {
+                    etTypeBien.showDropDown();
+                }
+            });
         }
     }
 
@@ -143,7 +165,8 @@ public class CreateAnnonceActivity extends AppCompatActivity {
                                         Annonce annonce = parseAnnonceFromJson(annonceObj);
                                         if (annonce != null) {
                                             populateFormWithAnnonce(annonce);
-                                            android.util.Log.d("CreateAnnonce", "Données chargées pour modification: " + annonce.getTitre());
+                                            android.util.Log.d("CreateAnnonce",
+                                                    "Données chargées pour modification: " + annonce.getTitre());
                                             return;
                                         }
                                     }
@@ -153,12 +176,14 @@ public class CreateAnnonceActivity extends AppCompatActivity {
 
                         // Si on arrive ici, l'annonce n'a pas été trouvée
                         android.util.Log.e("CreateAnnonce", "Annonce non trouvée dans la liste du propriétaire");
-                        Toast.makeText(CreateAnnonceActivity.this, "Annonce non trouvée ou accès non autorisé", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CreateAnnonceActivity.this, "Annonce non trouvée ou accès non autorisé",
+                                Toast.LENGTH_SHORT).show();
                         finish();
 
                     } catch (Exception e) {
                         android.util.Log.e("CreateAnnonce", "Erreur parsing annonce", e);
-                        Toast.makeText(CreateAnnonceActivity.this, "Erreur lors du traitement des données", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CreateAnnonceActivity.this, "Erreur lors du traitement des données",
+                                Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 } else {
@@ -187,7 +212,8 @@ public class CreateAnnonceActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
                 btnCreate.setEnabled(true);
                 android.util.Log.e("CreateAnnonce", "Erreur réseau chargement: " + t.getMessage(), t);
-                Toast.makeText(CreateAnnonceActivity.this, "Erreur réseau: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreateAnnonceActivity.this, "Erreur réseau: " + t.getMessage(), Toast.LENGTH_SHORT)
+                        .show();
                 finish();
             }
         });
@@ -204,20 +230,30 @@ public class CreateAnnonceActivity extends AppCompatActivity {
     }
 
     private void populateFormWithAnnonce(Annonce annonce) {
-        if (etTitre != null) etTitre.setText(annonce.getTitre());
-        if (etDescription != null) etDescription.setText(annonce.getDescription());
-        if (etLocalisation != null) etLocalisation.setText(annonce.getLocalisation());
-        if (etPrix != null) etPrix.setText(String.valueOf(annonce.getPrix()));
-        if (etNbPieces != null) etNbPieces.setText(String.valueOf(annonce.getNbPieces()));
-        if (etSurface != null) etSurface.setText(String.valueOf(annonce.getSurface()));
-        if (etTypeBien != null) etTypeBien.setText(annonce.getTypeBien());
-        if (etTelephone != null) etTelephone.setText(annonce.getTelephone());
+        if (etTitre != null)
+            etTitre.setText(annonce.getTitre());
+        if (etDescription != null)
+            etDescription.setText(annonce.getDescription());
+        if (etLocalisation != null)
+            etLocalisation.setText(annonce.getLocalisation());
+        if (etPrix != null)
+            etPrix.setText(String.valueOf(annonce.getPrix()));
+        if (etNbPieces != null)
+            etNbPieces.setText(String.valueOf(annonce.getNbPieces()));
+        if (etSurface != null)
+            etSurface.setText(String.valueOf(annonce.getSurface()));
+        if (etTypeBien != null)
+            etTypeBien.setText(annonce.getTypeBien(), false); // false pour ne pas filtrer
+        if (etTelephone != null)
+            etTelephone.setText(annonce.getTelephone());
 
         // Meublé (seule propriété booléenne disponible dans le modèle simplifié)
-        if (cbMeublee != null) cbMeublee.setChecked(annonce.isMeublee());
+        if (cbMeublee != null)
+            cbMeublee.setChecked(annonce.isMeublee());
 
         // Pour la modification, ne pas charger les images existantes
-        // L'utilisateur pourra ajouter de nouvelles images qui remplaceront les anciennes
+        // L'utilisateur pourra ajouter de nouvelles images qui remplaceront les
+        // anciennes
         if (isEditing) {
             // S'assurer que la liste des images sélectionnées est vide
             selectedImages.clear();
@@ -225,7 +261,8 @@ public class CreateAnnonceActivity extends AppCompatActivity {
             updateImageCount();
 
             android.util.Log.d("CreateAnnonce", "Mode modification - images existantes non chargées, liste vidée");
-            Toast.makeText(this, "Vous pouvez ajouter de nouvelles images pour remplacer celles existantes", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Vous pouvez ajouter de nouvelles images pour remplacer celles existantes",
+                    Toast.LENGTH_SHORT).show();
         }
 
         android.util.Log.d("CreateAnnonce", "Formulaire rempli avec les données de l'annonce");
@@ -257,7 +294,7 @@ public class CreateAnnonceActivity extends AppCompatActivity {
         rvSelectedImages.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         imagesAdapter = new SelectedImagesAdapter();
         rvSelectedImages.setAdapter(imagesAdapter);
-        
+
         updateImageCount();
 
         btnCreate.setOnClickListener(v -> saveAnnonce());
@@ -282,7 +319,7 @@ public class CreateAnnonceActivity extends AppCompatActivity {
             }
         });
     }
-    
+
     private void updateImageCount() {
         if (tvImageCount != null) {
             tvImageCount.setText(selectedImages.size() + "/10");
@@ -304,22 +341,24 @@ public class CreateAnnonceActivity extends AppCompatActivity {
         String nbPieces = etNbPieces.getText().toString().trim();
         String surface = etSurface.getText().toString().trim();
         String typeBien = etTypeBien.getText().toString().trim();
-        
+
         // Vérifier que le champ téléphone est initialisé et lire sa valeur
         String telephone = "";
         if (etTelephone == null) {
             android.util.Log.e("CreateAnnonce", "etTelephone est null - réinitialisation");
             etTelephone = findViewById(R.id.et_telephone);
         }
-        
+
         if (etTelephone != null) {
             CharSequence telText = etTelephone.getText();
             if (telText != null) {
                 telephone = telText.toString().trim();
-                // Nettoyer le téléphone (enlever seulement les espaces, garder le + et les chiffres)
+                // Nettoyer le téléphone (enlever seulement les espaces, garder le + et les
+                // chiffres)
                 telephone = telephone.replaceAll("\\s+", "");
-                android.util.Log.d("CreateAnnonce", "Téléphone lu depuis le champ: '" + telephone + "' (longueur: " + telephone.length() + ")");
-                
+                android.util.Log.d("CreateAnnonce",
+                        "Téléphone lu depuis le champ: '" + telephone + "' (longueur: " + telephone.length() + ")");
+
                 // Vérifier que le téléphone n'est pas vide après nettoyage
                 if (telephone.isEmpty()) {
                     android.util.Log.w("CreateAnnonce", "Téléphone vide après nettoyage");
@@ -372,12 +411,12 @@ public class CreateAnnonceActivity extends AppCompatActivity {
             android.util.Log.w("CreateAnnonce", "Téléphone vide détecté");
             hasError = true;
         }
-        
+
         if (hasError) {
             android.util.Log.d("CreateAnnonce", "Validation échouée - champs manquants");
             return;
         }
-        
+
         android.util.Log.d("CreateAnnonce", "Validation réussie - Téléphone: " + telephone);
 
         // En mode création, exiger au moins une image
@@ -389,13 +428,16 @@ public class CreateAnnonceActivity extends AppCompatActivity {
 
         // En mode modification, avertir si aucune nouvelle image n'est sélectionnée
         if (selectedImages.isEmpty() && isEditing) {
-            Toast.makeText(this, "Attention: Aucune nouvelle image sélectionnée. Les images existantes seront conservées.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this,
+                    "Attention: Aucune nouvelle image sélectionnée. Les images existantes seront conservées.",
+                    Toast.LENGTH_LONG).show();
         }
 
         progressBar.setVisibility(View.VISIBLE);
         btnCreate.setEnabled(false);
 
-        android.util.Log.d("CreateAnnonce", "Création annonce - URL: " + RetrofitClient.getInstance().getBaseUrl() + "annonces");
+        android.util.Log.d("CreateAnnonce",
+                "Création annonce - URL: " + RetrofitClient.getInstance().getBaseUrl() + "annonces");
 
         try {
             // Préparer les images avec gestion d'erreur
@@ -406,24 +448,24 @@ public class CreateAnnonceActivity extends AppCompatActivity {
                     android.util.Log.w("CreateAnnonce", "URI null à l'index " + i);
                     continue;
                 }
-                
+
                 try (InputStream inputStream = getContentResolver().openInputStream(uri)) {
                     if (inputStream == null) {
                         android.util.Log.e("CreateAnnonce", "Impossible d'ouvrir l'input stream pour l'image " + i);
                         continue;
                     }
-                    
+
                     byte[] bytes = readAllBytes(inputStream);
                     if (bytes == null || bytes.length == 0) {
                         android.util.Log.e("CreateAnnonce", "Image vide à l'index " + i);
                         continue;
                     }
-                    
+
                     String mime = getContentResolver().getType(uri);
                     if (mime == null || !mime.startsWith("image/")) {
                         mime = "image/jpeg";
                     }
-                    
+
                     String fileName = "image_" + i + ".jpg";
                     RequestBody imageRB = RequestBody.create(MediaType.parse(mime), bytes);
                     MultipartBody.Part imagePart = MultipartBody.Part.createFormData("images", fileName, imageRB);
@@ -434,7 +476,7 @@ public class CreateAnnonceActivity extends AppCompatActivity {
                     Toast.makeText(this, "Erreur lors du traitement de l'image " + (i + 1), Toast.LENGTH_SHORT).show();
                 }
             }
-            
+
             if (imageParts.isEmpty()) {
                 progressBar.setVisibility(View.GONE);
                 btnCreate.setEnabled(true);
@@ -451,22 +493,30 @@ public class CreateAnnonceActivity extends AppCompatActivity {
             RequestBody rbSurface = RequestBody.create(MediaType.parse("text/plain"), surface);
             RequestBody rbTypeBien = RequestBody.create(MediaType.parse("text/plain"), typeBien);
             RequestBody rbProprietaire = RequestBody.create(MediaType.parse("text/plain"), proprietaireId);
-            RequestBody rbMeublee = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(cbMeublee.isChecked()));
-            RequestBody rbAscenseur = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(cbAscenseur.isChecked()));
-            RequestBody rbParking = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(cbParking.isChecked()));
-            RequestBody rbClimatisation = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(cbClimatisation.isChecked()));
-            RequestBody rbChauffage = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(cbChauffage.isChecked()));
-            RequestBody rbBalcon = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(cbBalcon.isChecked()));
-            RequestBody rbJardin = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(cbJardin.isChecked()));
-            RequestBody rbPiscine = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(cbPiscine.isChecked()));
-            
+            RequestBody rbMeublee = RequestBody.create(MediaType.parse("text/plain"),
+                    String.valueOf(cbMeublee.isChecked()));
+            RequestBody rbAscenseur = RequestBody.create(MediaType.parse("text/plain"),
+                    String.valueOf(cbAscenseur.isChecked()));
+            RequestBody rbParking = RequestBody.create(MediaType.parse("text/plain"),
+                    String.valueOf(cbParking.isChecked()));
+            RequestBody rbClimatisation = RequestBody.create(MediaType.parse("text/plain"),
+                    String.valueOf(cbClimatisation.isChecked()));
+            RequestBody rbChauffage = RequestBody.create(MediaType.parse("text/plain"),
+                    String.valueOf(cbChauffage.isChecked()));
+            RequestBody rbBalcon = RequestBody.create(MediaType.parse("text/plain"),
+                    String.valueOf(cbBalcon.isChecked()));
+            RequestBody rbJardin = RequestBody.create(MediaType.parse("text/plain"),
+                    String.valueOf(cbJardin.isChecked()));
+            RequestBody rbPiscine = RequestBody.create(MediaType.parse("text/plain"),
+                    String.valueOf(cbPiscine.isChecked()));
+
             RequestBody rbEtage = null;
             if (!TextUtils.isEmpty(etEtage.getText())) {
                 rbEtage = RequestBody.create(MediaType.parse("text/plain"), etEtage.getText().toString());
             } else {
                 rbEtage = RequestBody.create(MediaType.parse("text/plain"), "");
             }
-            
+
             // S'assurer que le téléphone n'est pas vide
             if (TextUtils.isEmpty(telephone)) {
                 progressBar.setVisibility(View.GONE);
@@ -476,8 +526,9 @@ public class CreateAnnonceActivity extends AppCompatActivity {
                 android.util.Log.e("CreateAnnonce", "Téléphone vide avant envoi");
                 return;
             }
-            
-            // Vérifier une dernière fois que le téléphone n'est pas vide avant de créer le RequestBody
+
+            // Vérifier une dernière fois que le téléphone n'est pas vide avant de créer le
+            // RequestBody
             if (TextUtils.isEmpty(telephone)) {
                 progressBar.setVisibility(View.GONE);
                 btnCreate.setEnabled(true);
@@ -489,7 +540,7 @@ public class CreateAnnonceActivity extends AppCompatActivity {
                 android.util.Log.e("CreateAnnonce", "Téléphone vide détecté juste avant l'envoi");
                 return;
             }
-            
+
             RequestBody rbTelephone = RequestBody.create(MediaType.parse("text/plain"), telephone);
 
             android.util.Log.d("CreateAnnonce", "=== Données à envoyer ===");
@@ -497,7 +548,8 @@ public class CreateAnnonceActivity extends AppCompatActivity {
             android.util.Log.d("CreateAnnonce", "Titre: " + titre);
             android.util.Log.d("CreateAnnonce", "Proprietaire ID: " + proprietaireId);
             android.util.Log.d("CreateAnnonce", "Prix: " + prix);
-            android.util.Log.d("CreateAnnonce", "Téléphone: '" + telephone + "' (longueur: " + telephone.length() + ")");
+            android.util.Log.d("CreateAnnonce",
+                    "Téléphone: '" + telephone + "' (longueur: " + telephone.length() + ")");
             android.util.Log.d("CreateAnnonce", "Meublée: " + cbMeublee.isChecked());
 
             if (isEditing && annonceId != null) {
@@ -505,142 +557,156 @@ public class CreateAnnonceActivity extends AppCompatActivity {
                 android.util.Log.d("CreateAnnonce", "Mode modification - annonceId: " + annonceId);
 
                 annonceService.updateAnnonceByProprietaire(annonceId,
-                    rbTitre, rbDescription, rbLocalisation, rbPrix, rbNbPieces, rbSurface, rbTypeBien,
-                    rbMeublee, rbAscenseur, rbParking, rbClimatisation, rbChauffage,
-                    rbBalcon, rbJardin, rbPiscine, rbEtage, rbTelephone, imageParts.toArray(new MultipartBody.Part[0])
-                ).enqueue(new Callback<JsonObject>() {
-                @Override
-                public void onResponse(@NonNull Call<JsonObject> call, @NonNull Response<JsonObject> response) {
-                    progressBar.setVisibility(View.GONE);
-                    btnCreate.setEnabled(true);
-                    android.util.Log.d("CreateAnnonce", "Réponse: " + response.code());
-                    
-                    if (response.isSuccessful()) {
-                        Toast.makeText(CreateAnnonceActivity.this, isEditing ? "Annonce modifiée avec succès" : "Annonce créée avec succès", Toast.LENGTH_LONG).show();
-                        finish();
-                    } else {
-                        android.util.Log.e("CreateAnnonce", "Erreur sauvegarde - Code: " + response.code() + " - URL: " + call.request().url());
-                        String errorMsg = "Erreur " + response.code();
+                        rbTitre, rbDescription, rbLocalisation, rbPrix, rbNbPieces, rbSurface, rbTypeBien,
+                        rbMeublee, rbAscenseur, rbParking, rbClimatisation, rbChauffage,
+                        rbBalcon, rbJardin, rbPiscine, rbEtage, rbTelephone,
+                        imageParts.toArray(new MultipartBody.Part[0])).enqueue(new Callback<JsonObject>() {
+                            @Override
+                            public void onResponse(@NonNull Call<JsonObject> call,
+                                    @NonNull Response<JsonObject> response) {
+                                progressBar.setVisibility(View.GONE);
+                                btnCreate.setEnabled(true);
+                                android.util.Log.d("CreateAnnonce", "Réponse: " + response.code());
 
-                        // Gestion spécifique des erreurs d'authentification
-                        if (response.code() == 401) {
-                            errorMsg = "Session expirée. Veuillez vous reconnecter.";
-                            // Rediriger vers la page de connexion
-                            Intent intent = new Intent(CreateAnnonceActivity.this, LoginActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                            finish();
-                            return;
-                        } else if (response.code() == 403) {
-                            errorMsg = "Vous n'avez pas l'autorisation d'effectuer cette action";
-                        } else if (response.code() == 404) {
-                            errorMsg = "Endpoint non trouvé (404). Vérifiez que le backend est démarré.";
-                        }
+                                if (response.isSuccessful()) {
+                                    Toast.makeText(CreateAnnonceActivity.this,
+                                            isEditing ? "Annonce modifiée avec succès" : "Annonce créée avec succès",
+                                            Toast.LENGTH_LONG).show();
+                                    finish();
+                                } else {
+                                    android.util.Log.e("CreateAnnonce", "Erreur sauvegarde - Code: " + response.code()
+                                            + " - URL: " + call.request().url());
+                                    String errorMsg = "Erreur " + response.code();
 
-                        try {
-                            if (response.errorBody() != null) {
-                                String errorBody = response.errorBody().string();
-                                android.util.Log.e("CreateAnnonce", "Erreur body: " + errorBody);
-                                if (errorBody.contains("\"message\"")) {
-                                    int start = errorBody.indexOf("\"message\"");
-                                    if (start != -1) {
-                                        int msgStart = errorBody.indexOf("\"", start + 10) + 1;
-                                        int msgEnd = errorBody.indexOf("\"", msgStart);
-                                        if (msgEnd > msgStart) {
-                                            errorMsg = errorBody.substring(msgStart, msgEnd);
+                                    // Gestion spécifique des erreurs d'authentification
+                                    if (response.code() == 401) {
+                                        errorMsg = "Session expirée. Veuillez vous reconnecter.";
+                                        // Rediriger vers la page de connexion
+                                        Intent intent = new Intent(CreateAnnonceActivity.this, LoginActivity.class);
+                                        intent.addFlags(
+                                                Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(intent);
+                                        finish();
+                                        return;
+                                    } else if (response.code() == 403) {
+                                        errorMsg = "Vous n'avez pas l'autorisation d'effectuer cette action";
+                                    } else if (response.code() == 404) {
+                                        errorMsg = "Endpoint non trouvé (404). Vérifiez que le backend est démarré.";
+                                    }
+
+                                    try {
+                                        if (response.errorBody() != null) {
+                                            String errorBody = response.errorBody().string();
+                                            android.util.Log.e("CreateAnnonce", "Erreur body: " + errorBody);
+                                            if (errorBody.contains("\"message\"")) {
+                                                int start = errorBody.indexOf("\"message\"");
+                                                if (start != -1) {
+                                                    int msgStart = errorBody.indexOf("\"", start + 10) + 1;
+                                                    int msgEnd = errorBody.indexOf("\"", msgStart);
+                                                    if (msgEnd > msgStart) {
+                                                        errorMsg = errorBody.substring(msgStart, msgEnd);
+                                                    }
+                                                }
+                                            } else if (errorBody.contains("message")) {
+                                                // Format alternatif
+                                                int start = errorBody.indexOf("message");
+                                                if (start != -1) {
+                                                    int msgStart = errorBody.indexOf(":", start) + 1;
+                                                    int msgEnd = errorBody.indexOf(",", msgStart);
+                                                    if (msgEnd == -1)
+                                                        msgEnd = errorBody.indexOf("}", msgStart);
+                                                    if (msgEnd > msgStart) {
+                                                        String msg = errorBody.substring(msgStart, msgEnd).trim();
+                                                        if (msg.startsWith("\""))
+                                                            msg = msg.substring(1);
+                                                        if (msg.endsWith("\""))
+                                                            msg = msg.substring(0, msg.length() - 1);
+                                                        errorMsg = msg;
+                                                    }
+                                                }
+                                            }
+
+                                            // Si l'erreur concerne le téléphone, mettre le focus sur le champ
+                                            if (errorMsg.toLowerCase().contains("téléphone")
+                                                    || errorMsg.toLowerCase().contains("telephone")) {
+                                                android.util.Log.e("CreateAnnonce",
+                                                        "Erreur téléphone détectée: " + errorMsg);
+                                                if (etTelephone != null) {
+                                                    etTelephone.setError("Le numéro de téléphone est requis");
+                                                    etTelephone.requestFocus();
+                                                }
+                                            }
                                         }
+                                    } catch (Exception e) {
+                                        android.util.Log.e("CreateAnnonce", "Erreur parsing: " + e.getMessage(), e);
                                     }
-                                } else if (errorBody.contains("message")) {
-                                    // Format alternatif
-                                    int start = errorBody.indexOf("message");
-                                    if (start != -1) {
-                                        int msgStart = errorBody.indexOf(":", start) + 1;
-                                        int msgEnd = errorBody.indexOf(",", msgStart);
-                                        if (msgEnd == -1) msgEnd = errorBody.indexOf("}", msgStart);
-                                        if (msgEnd > msgStart) {
-                                            String msg = errorBody.substring(msgStart, msgEnd).trim();
-                                            if (msg.startsWith("\"")) msg = msg.substring(1);
-                                            if (msg.endsWith("\"")) msg = msg.substring(0, msg.length() - 1);
-                                            errorMsg = msg;
-                                        }
-                                    }
-                                }
 
-                                // Si l'erreur concerne le téléphone, mettre le focus sur le champ
-                                if (errorMsg.toLowerCase().contains("téléphone") || errorMsg.toLowerCase().contains("telephone")) {
-                                    android.util.Log.e("CreateAnnonce", "Erreur téléphone détectée: " + errorMsg);
-                                    if (etTelephone != null) {
-                                        etTelephone.setError("Le numéro de téléphone est requis");
-                                        etTelephone.requestFocus();
-                                    }
+                                    Toast.makeText(CreateAnnonceActivity.this, errorMsg, Toast.LENGTH_LONG).show();
                                 }
                             }
-                        } catch (Exception e) {
-                            android.util.Log.e("CreateAnnonce", "Erreur parsing: " + e.getMessage(), e);
-                        }
 
-                        Toast.makeText(CreateAnnonceActivity.this, errorMsg, Toast.LENGTH_LONG).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
-                    progressBar.setVisibility(View.GONE);
-                    btnCreate.setEnabled(true);
-                    android.util.Log.e("CreateAnnonce", "Erreur réseau modification", t);
-                    Toast.makeText(CreateAnnonceActivity.this, "Erreur réseau: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+                            @Override
+                            public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
+                                progressBar.setVisibility(View.GONE);
+                                btnCreate.setEnabled(true);
+                                android.util.Log.e("CreateAnnonce", "Erreur réseau modification", t);
+                                Toast.makeText(CreateAnnonceActivity.this, "Erreur réseau: " + t.getMessage(),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
             } else {
                 // Mode création
                 android.util.Log.d("CreateAnnonce", "Mode création");
 
                 annonceService.createAnnonceByProprietaire(
-                    rbTitre, rbDescription, rbLocalisation, rbPrix, rbNbPieces, rbSurface, rbTypeBien,
-                    rbMeublee, rbAscenseur, rbParking, rbClimatisation, rbChauffage,
-                    rbBalcon, rbJardin, rbPiscine, rbEtage, rbTelephone, imageParts.toArray(new MultipartBody.Part[0])
-                ).enqueue(new Callback<JsonObject>() {
-                    @Override
-                    public void onResponse(@NonNull Call<JsonObject> call, @NonNull Response<JsonObject> response) {
-                        progressBar.setVisibility(View.GONE);
-                        btnCreate.setEnabled(true);
-                        android.util.Log.d("CreateAnnonce", "Réponse création: " + response.code());
+                        rbTitre, rbDescription, rbLocalisation, rbPrix, rbNbPieces, rbSurface, rbTypeBien,
+                        rbMeublee, rbAscenseur, rbParking, rbClimatisation, rbChauffage,
+                        rbBalcon, rbJardin, rbPiscine, rbEtage, rbTelephone,
+                        imageParts.toArray(new MultipartBody.Part[0])).enqueue(new Callback<JsonObject>() {
+                            @Override
+                            public void onResponse(@NonNull Call<JsonObject> call,
+                                    @NonNull Response<JsonObject> response) {
+                                progressBar.setVisibility(View.GONE);
+                                btnCreate.setEnabled(true);
+                                android.util.Log.d("CreateAnnonce", "Réponse création: " + response.code());
 
-                        if (response.isSuccessful()) {
-                            Toast.makeText(CreateAnnonceActivity.this, "Annonce créée avec succès", Toast.LENGTH_LONG).show();
-                            finish();
-                        } else {
-                            String errorMsg = "Erreur " + response.code();
-                            try {
-                                if (response.errorBody() != null) {
-                                    String errorBody = response.errorBody().string();
-                                    android.util.Log.e("CreateAnnonce", "Erreur body: " + errorBody);
-                                    if (errorBody.contains("\"message\"")) {
-                                        int start = errorBody.indexOf("\"message\"");
-                                        if (start != -1) {
-                                            int msgStart = errorBody.indexOf("\"", start + 10) + 1;
-                                            int msgEnd = errorBody.indexOf("\"", msgStart);
-                                            if (msgEnd > msgStart) {
-                                                errorMsg = errorBody.substring(msgStart, msgEnd);
+                                if (response.isSuccessful()) {
+                                    Toast.makeText(CreateAnnonceActivity.this, "Annonce créée avec succès",
+                                            Toast.LENGTH_LONG).show();
+                                    finish();
+                                } else {
+                                    String errorMsg = "Erreur " + response.code();
+                                    try {
+                                        if (response.errorBody() != null) {
+                                            String errorBody = response.errorBody().string();
+                                            android.util.Log.e("CreateAnnonce", "Erreur body: " + errorBody);
+                                            if (errorBody.contains("\"message\"")) {
+                                                int start = errorBody.indexOf("\"message\"");
+                                                if (start != -1) {
+                                                    int msgStart = errorBody.indexOf("\"", start + 10) + 1;
+                                                    int msgEnd = errorBody.indexOf("\"", msgStart);
+                                                    if (msgEnd > msgStart) {
+                                                        errorMsg = errorBody.substring(msgStart, msgEnd);
+                                                    }
+                                                }
                                             }
                                         }
+                                    } catch (Exception e) {
+                                        android.util.Log.e("CreateAnnonce", "Erreur parsing: " + e.getMessage(), e);
                                     }
+                                    Toast.makeText(CreateAnnonceActivity.this, errorMsg, Toast.LENGTH_LONG).show();
                                 }
-                            } catch (Exception e) {
-                                android.util.Log.e("CreateAnnonce", "Erreur parsing: " + e.getMessage(), e);
                             }
-                            Toast.makeText(CreateAnnonceActivity.this, errorMsg, Toast.LENGTH_LONG).show();
-                        }
-                    }
 
-                    @Override
-                    public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
-                        progressBar.setVisibility(View.GONE);
-                        btnCreate.setEnabled(true);
-                        android.util.Log.e("CreateAnnonce", "Erreur réseau création", t);
-                        Toast.makeText(CreateAnnonceActivity.this, "Erreur réseau: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                            @Override
+                            public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
+                                progressBar.setVisibility(View.GONE);
+                                btnCreate.setEnabled(true);
+                                android.util.Log.e("CreateAnnonce", "Erreur réseau création", t);
+                                Toast.makeText(CreateAnnonceActivity.this, "Erreur réseau: " + t.getMessage(),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
 
         } catch (Exception e) {
@@ -667,7 +733,8 @@ public class CreateAnnonceActivity extends AppCompatActivity {
         } catch (IOException e) {
             try {
                 buffer.close();
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
             throw e;
         }
         return buffer.toByteArray();
@@ -678,7 +745,7 @@ public class CreateAnnonceActivity extends AppCompatActivity {
         @Override
         public ImageVH onCreateViewHolder(@NonNull android.view.ViewGroup parent, int viewType) {
             android.view.View view = android.view.LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_selected_image, parent, false);
+                    .inflate(R.layout.item_selected_image, parent, false);
             return new ImageVH(view);
         }
 
@@ -708,7 +775,7 @@ public class CreateAnnonceActivity extends AppCompatActivity {
                 android.util.Log.w("CreateAnnonce", "URI null à la position " + position);
                 return;
             }
-            
+
             try (InputStream inputStream = getContentResolver().openInputStream(uri)) {
                 if (inputStream != null) {
                     android.graphics.Bitmap bitmap = BitmapFactory.decodeStream(inputStream);

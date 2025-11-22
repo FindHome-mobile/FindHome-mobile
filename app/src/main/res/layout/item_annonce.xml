@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="8dp"
+    android:layout_marginVertical="10dp"
     app:cardCornerRadius="20dp"
-    app:cardElevation="2dp"
+    app:cardElevation="6dp"
     app:strokeWidth="0dp"
     android:clickable="true"
     android:focusable="true"
@@ -14,116 +15,121 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="0dp">
+        android:layout_height="wrap_content">
 
-        <!-- Image de l'annonce -->
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/iv_annonce_image"
+        <!-- Image Container -->
+        <FrameLayout
+            android:id="@+id/image_container"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:contentDescription="Image de l'annonce"
-            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.TopRounded"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            android:layout_height="240dp"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Badge Type de bien -->
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="maison"
-            style="@style/Widget.Material3.Chip.Assist"
-            app:chipBackgroundColor="?attr/colorPrimaryContainer"
-            app:chipMinHeight="28dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="12dp"
-            app:layout_constraintTop_toTopOf="@+id/iv_annonce_image"
-            app:layout_constraintStart_toStartOf="@+id/iv_annonce_image"/>
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/iv_annonce_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@android:drawable/ic_menu_gallery" />
 
-        <!-- Contenu texte -->
+            <!-- Gradient Overlay for text readability if needed, or just aesthetic -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_gravity="bottom"
+                android:background="@drawable/gradient_bottom_overlay" />
+            
+            <!-- Price Tag on Image (Modern Style) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardBackgroundColor="@color/md_primary"
+                app:cardElevation="4dp">
+                
+                <TextView
+                    android:id="@+id/tv_prix"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    android:text="1200 DT"
+                    android:textColor="@color/md_onPrimary"
+                    android:textStyle="bold"
+                    android:textSize="16sp"/>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Type Chip on Image -->
+             <com.google.android.material.chip.Chip
+                android:id="@+id/chip_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|start"
+                android:layout_margin="16dp"
+                android:text="Appartement"
+                android:textColor="@color/md_onSecondaryContainer"
+                app:chipBackgroundColor="@color/md_secondaryContainer"
+                app:chipStrokeWidth="0dp"
+                app:chipMinHeight="32dp"
+                style="@style/Widget.Material3.Chip.Assist"/>
+
+        </FrameLayout>
+
+        <!-- Content Container -->
         <LinearLayout
-            android:id="@+id/layout_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/iv_annonce_image"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/image_container"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <TextView
                 android:id="@+id/tv_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Titre de l'annonce"
+                android:text="Villa de Luxe avec Piscine"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                android:textSize="18sp"
-                android:textColor="?attr/colorOnBackground"
-                android:maxLines="1"
+                android:textColor="@color/md_onSurface"
+                android:maxLines="2"
                 android:ellipsize="end"
-                android:letterSpacing="0.01"/>
+                android:layout_marginBottom="8dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="6dp">
+                android:gravity="center_vertical">
 
                 <ImageView
                     android:layout_width="16dp"
                     android:layout_height="16dp"
-                    android:src="@android:drawable/ic_menu_mylocation"
-                    android:tint="?attr/colorOutline"
+                    android:src="@drawable/ic_location"
+                    app:tint="@color/md_onSurfaceVariant"
                     android:layout_marginEnd="4dp"/>
 
                 <TextView
                     android:id="@+id/tv_subtitle"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Localisation"
+                    android:text="La Marsa, Tunis"
                     android:textSize="14sp"
-                    android:textColor="?attr/colorOutline"
+                    android:textColor="@color/md_onSurfaceVariant"
                     android:maxLines="1"
                     android:ellipsize="end"/>
             </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            
+            <!-- Hidden views kept for compatibility if referenced in code but not shown in new design -->
+            <TextView
+                android:id="@+id/tv_type_bien"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="12dp">
+                android:visibility="gone"/>
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/tv_type_bien"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Type"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    app:chipBackgroundColor="?attr/colorPrimaryContainer"
-                    app:chipMinHeight="32dp"
-                    android:textSize="12sp"/>
-
-                <TextView
-                    android:id="@+id/tv_prix"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="0 DT"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorPrimary"
-                    android:letterSpacing="0.02"
-                    android:gravity="end"/>
-            </LinearLayout>
-
-            <!-- Boutons d'action (visibles seulement dans Mes annonces) -->
-            <LinearLayout
+            <!-- Action Buttons (only visible for owner) -->
+             <LinearLayout
                 android:id="@+id/layout_actions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -138,12 +144,7 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
                     android:text="Modifier"
-                    android:textColor="?attr/colorOnPrimary"
-                    app:backgroundTint="?attr/colorPrimary"
-                    app:icon="@android:drawable/ic_menu_edit"
-                    app:iconTint="?attr/colorOnPrimary"
-                    style="@style/Widget.Material3.Button.Icon"
-                    app:iconGravity="textStart" />
+                    style="@style/Widget.Material3.Button.TonalButton"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_delete"
@@ -152,13 +153,9 @@
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     android:text="Supprimer"
-                    android:textColor="?attr/colorOnError"
-                    app:backgroundTint="?attr/colorError"
-                    app:icon="@android:drawable/ic_menu_delete"
-                    app:iconTint="?attr/colorOnError"
-                    style="@style/Widget.Material3.Button.Icon"
-                    app:iconGravity="textStart" />
-
+                    android:textColor="@color/md_onError"
+                    app:backgroundTint="@color/md_error"
+                    style="@style/Widget.Material3.Button"/>
             </LinearLayout>
 
         </LinearLayout>

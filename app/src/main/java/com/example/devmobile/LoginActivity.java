@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         try {
             setContentView(R.layout.activity_login);
 
@@ -85,6 +85,22 @@ public class LoginActivity extends AppCompatActivity {
                         startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
                     }
                 });
+
+                // Configurer les boutons sociaux pour afficher les icônes en couleur originale
+                com.google.android.material.button.MaterialButton btnFacebook = findViewById(R.id.btn_facebook);
+                com.google.android.material.button.MaterialButton btnGoogle = findViewById(R.id.btn_google);
+
+                if (btnFacebook != null) {
+                    btnFacebook.setIconTint(null);
+                    btnFacebook.setOnClickListener(v -> Toast
+                            .makeText(LoginActivity.this, "Connexion Facebook à venir", Toast.LENGTH_SHORT).show());
+                }
+
+                if (btnGoogle != null) {
+                    btnGoogle.setIconTint(null);
+                    btnGoogle.setOnClickListener(v -> Toast
+                            .makeText(LoginActivity.this, "Connexion Google à venir", Toast.LENGTH_SHORT).show());
+                }
             } catch (Exception e) {
                 Log.e("LoginActivity", "Erreur initialisation vues", e);
                 Toast.makeText(this, "Erreur d'initialisation: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -151,7 +167,10 @@ public class LoginActivity extends AppCompatActivity {
                                 Log.e("LOGIN_PREF", "Failed to persist user: " + e.getMessage(), e);
                             }
 
-                            Toast.makeText(LoginActivity.this, "Connexion réussie! Bienvenue " + (user.getPrenom() != null ? user.getPrenom() : ""), Toast.LENGTH_LONG).show();
+                            Toast.makeText(LoginActivity.this,
+                                    "Connexion réussie! Bienvenue "
+                                            + (user.getPrenom() != null ? user.getPrenom() : ""),
+                                    Toast.LENGTH_LONG).show();
                             startDashboardActivity();
 
                         } else {
@@ -180,7 +199,8 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     } catch (Exception e) {
                         Log.e("LoginActivity", "Erreur dans onResponse", e);
-                        Toast.makeText(LoginActivity.this, "Erreur lors de la connexion: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(LoginActivity.this, "Erreur lors de la connexion: " + e.getMessage(),
+                                Toast.LENGTH_LONG).show();
                     }
                 }
 

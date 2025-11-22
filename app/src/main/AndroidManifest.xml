@@ -16,13 +16,17 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.FinHome">
         <activity
-            android:name="com.example.devmobile.LoginActivity"
+            android:name="com.example.devmobile.WelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.example.devmobile.LoginActivity"
+            android:exported="false" />
 
         <activity
             android:name="com.example.devmobile.RegisterActivity"

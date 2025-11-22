@@ -378,7 +378,8 @@ public class FavoritesActivity extends AppCompatActivity implements NavigationVi
     private class FavoriteVH extends RecyclerView.ViewHolder {
         private final TextView tvTitle, tvSubtitle, tvPrix;
         private final com.google.android.material.imageview.ShapeableImageView ivImage;
-        private final com.google.android.material.chip.Chip chipType, tvTypeBien;
+        private final com.google.android.material.chip.Chip chipType;
+        private final TextView tvTypeBien;
 
         FavoriteVH(@NonNull View itemView) {
             super(itemView);

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="120dp"
     android:layout_height="120dp"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    android:layout_marginEnd="12dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:strokeWidth="0dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -18,20 +20,30 @@
             android:scaleType="centerCrop"
             android:contentDescription="Image sélectionnée" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#1A000000"/>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_remove"
-            style="@style/Widget.Material3.Button.IconButton"
+            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-            android:layout_margin="4dp"
-            android:backgroundTint="@android:color/white"
+            android:layout_margin="6dp"
+            android:padding="0dp"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            app:backgroundTint="@color/md_errorContainer"
             android:contentDescription="Supprimer"
             app:icon="@android:drawable/ic_menu_delete"
-            app:iconTint="?attr/colorError"
-            app:iconSize="20dp" />
+            app:iconTint="@color/md_onErrorContainer"
+            app:iconSize="18dp" />
 
     </RelativeLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

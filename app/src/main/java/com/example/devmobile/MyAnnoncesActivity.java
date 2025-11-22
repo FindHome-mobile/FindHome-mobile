@@ -281,7 +281,8 @@ public class MyAnnoncesActivity extends AppCompatActivity implements NavigationV
     private class AnnonceVH extends RecyclerView.ViewHolder {
         private final TextView tvTitle, tvSubtitle, tvPrix;
         private final com.google.android.material.imageview.ShapeableImageView ivImage;
-        private final com.google.android.material.chip.Chip chipType, tvTypeBien;
+        private final com.google.android.material.chip.Chip chipType;
+        private final TextView tvTypeBien;
 
         AnnonceVH(@NonNull View itemView) {
             super(itemView);
@@ -365,7 +366,7 @@ public class MyAnnoncesActivity extends AppCompatActivity implements NavigationV
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            startActivity(new Intent(MyAnnoncesActivity.this, ListingsActivity.class));
+            startActivity(new Intent(MyAnnoncesActivity.this, DashboardActivity.class));
         } else if (id == R.id.nav_favorites) {
             startActivity(new Intent(MyAnnoncesActivity.this, FavoritesActivity.class));
         } else if (id == R.id.nav_my_annonces) {
