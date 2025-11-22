@@ -41,6 +41,9 @@ public class AdminActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
+        // Initialiser le contexte pour Retrofit
+        RetrofitClient.setContext(this);
+
         Toolbar toolbar = findViewById(R.id.toolbar_admin);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {

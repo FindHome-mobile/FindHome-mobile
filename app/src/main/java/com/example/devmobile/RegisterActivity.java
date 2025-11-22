@@ -37,6 +37,9 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        // Initialiser le contexte pour Retrofit
+        RetrofitClient.setContext(this);
+
         authService = RetrofitClient.getInstance().getAuthService();
 
         // Initialisation des vues

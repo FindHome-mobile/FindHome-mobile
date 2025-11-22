@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -61,6 +62,9 @@ public class AnnonceDetailActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        // Initialiser le contexte pour Retrofit
+        RetrofitClient.setContext(this);
 
         SharedPreferences prefs = getSharedPreferences("AuthPrefs", MODE_PRIVATE);
         clientId = prefs.getString("USER_ID", null);
@@ -232,24 +236,46 @@ public class AnnonceDetailActivity extends AppCompatActivity {
     }
 
     private void addFavorite() {
+        Log.d("AnnonceDetailActivity", "Tentative d'ajout aux favoris - clientId: " + clientId + ", annonceId: " + annonceId);
+
         JsonObject body = new JsonObject();
         body.addProperty("clientId", clientId);
         body.addProperty("annonceId", annonceId);
 
+        Log.d("AnnonceDetailActivity", "Corps de la requête: " + body.toString());
+
         favoriService.addToFavorites(body).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(@NonNull Call<JsonObject> call, @NonNull Response<JsonObject> response) {
+                Log.d("AnnonceDetailActivity", "Réponse ajout favori - Code: " + response.code());
+
                 if (response.isSuccessful()) {
+                    Log.d("AnnonceDetailActivity", "Favori ajouté avec succès");
                     isFavorite = true;
                     updateFavoriteButton();
                     Toast.makeText(AnnonceDetailActivity.this, "Ajouté aux favoris", Toast.LENGTH_SHORT).show();
+
+                    if (response.body() != null) {
+                        Log.d("AnnonceDetailActivity", "Réponse ajout favori: " + response.body().toString());
+                    }
                 } else {
+                    Log.e("AnnonceDetailActivity", "Erreur ajout favori - Code: " + response.code());
                     Toast.makeText(AnnonceDetailActivity.this, "Erreur: " + response.code(), Toast.LENGTH_SHORT).show();
+
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorBody = response.errorBody().string();
+                            Log.e("AnnonceDetailActivity", "Corps erreur ajout favori: " + errorBody);
+                        } catch (Exception e) {
+                            Log.e("AnnonceDetailActivity", "Impossible de lire le corps d'erreur", e);
+                        }
+                    }
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
+                Log.e("AnnonceDetailActivity", "Erreur réseau ajout favori: " + t.getMessage(), t);
                 Toast.makeText(AnnonceDetailActivity.this, "Erreur réseau: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

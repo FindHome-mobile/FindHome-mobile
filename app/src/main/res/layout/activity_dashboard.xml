@@ -176,6 +176,28 @@
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
 
+                <!-- Bouton de filtrage -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="end"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Filtrer les annonces"
+                        android:backgroundTint="?attr/colorPrimaryContainer"
+                        android:textColor="?attr/colorOnPrimaryContainer"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        app:chipIconEnabled="true"
+                        app:chipIconTint="?attr/colorOnPrimaryContainer"
+                        app:chipIcon="@android:drawable/ic_menu_sort_by_size"/>
+                </LinearLayout>
+
                 <!-- Section Annonces avec header moderne -->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -192,23 +214,13 @@
                         android:layout_marginEnd="12dp"/>
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:text="Annonces Disponibles"
                         android:textSize="22sp"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnBackground"
                         android:letterSpacing="0.01"/>
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tous"
-                        style="@style/Widget.Material3.Chip.Filter"
-                        app:chipIconEnabled="true"
-                        app:chipIcon="@android:drawable/ic_menu_sort_by_size"/>
                 </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView

@@ -60,6 +60,9 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        // Initialiser le contexte pour Retrofit
+        RetrofitClient.setContext(this);
+
         // Configuration de la barre d'outils
         Toolbar toolbar = findViewById(R.id.toolbar_profile);
         setSupportActionBar(toolbar);

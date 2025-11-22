@@ -32,10 +32,29 @@ public class ListingsActivity extends AppCompatActivity {
     private TextView tvEmpty;
     private AnnoncesAdapter adapter;
 
+    // Filtres
+    private com.google.android.material.textfield.TextInputEditText etLocalisation;
+    private com.google.android.material.textfield.TextInputEditText etPrixMin;
+    private com.google.android.material.textfield.TextInputEditText etPrixMax;
+    private com.google.android.material.button.MaterialButton btnFilter;
+    private com.google.android.material.button.MaterialButton btnClearFilters;
+
+    // Valeurs des filtres actuels
+    private String currentLocalisation = null;
+    private String currentPrixMin = null;
+    private String currentPrixMax = null;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_listings);
+        android.util.Log.d("ListingsActivity", "onCreate appelé");
+        try {
+            setContentView(R.layout.activity_listings);
+            android.util.Log.d("ListingsActivity", "setContentView réussi");
+        } catch (Exception e) {
+            android.util.Log.e("ListingsActivity", "Erreur dans setContentView", e);
+            throw e;
+        }
 
         Toolbar toolbar = findViewById(R.id.toolbar_listings);
         if (toolbar != null) {
@@ -51,9 +70,26 @@ public class ListingsActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progress);
         tvEmpty = findViewById(R.id.tv_empty);
 
+        // Initialiser les vues de filtrage
+        etLocalisation = findViewById(R.id.et_localisation);
+        etPrixMin = findViewById(R.id.et_prix_min);
+        etPrixMax = findViewById(R.id.et_prix_max);
+        btnFilter = findViewById(R.id.btn_filter);
+        btnClearFilters = findViewById(R.id.btn_clear_filters);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new AnnoncesAdapter();
         recyclerView.setAdapter(adapter);
+
+        // Configurer les boutons de filtrage
+        if (btnFilter != null) {
+            btnFilter.setOnClickListener(v -> applyFilters());
+        }
+        if (btnClearFilters != null) {
+            btnClearFilters.setOnClickListener(v -> clearFilters());
+        }
+
+        // TODO: Ajouter la fonctionnalité de recherche avec la touche Entrée si souhaité
 
         loadAnnonces();
     }
@@ -66,12 +102,23 @@ public class ListingsActivity extends AppCompatActivity {
     }
 
     private void loadAnnonces() {
+        loadAnnoncesWithFilters(currentLocalisation, currentPrixMin, currentPrixMax);
+    }
+
+    private void loadAnnoncesWithFilters(String localisation, String prixMin, String prixMax) {
+        android.util.Log.d("ListingsActivity", "loadAnnoncesWithFilters appelé");
+        // Initialiser le contexte pour Retrofit
+        RetrofitClient.setContext(this);
+        android.util.Log.d("ListingsActivity", "RetrofitClient.setContext réussi");
+
         progressBar.setVisibility(View.VISIBLE);
         tvEmpty.setVisibility(View.GONE);
         RetrofitClient client = RetrofitClient.getInstance();
+        android.util.Log.d("ListingsActivity", "RetrofitClient.getInstance réussi");
         AnnonceService service = client.getAnnonceService();
-        Log.d("ListingsActivity", "Chargement des annonces...");
-        service.getAnnonces(null, null, null, null, null, null).enqueue(new Callback<AnnonceListResponse>() {
+        android.util.Log.d("ListingsActivity", "AnnonceService créé");
+        Log.d("ListingsActivity", "Chargement des annonces avec filtres - localisation: " + localisation + ", prixMin: " + prixMin + ", prixMax: " + prixMax);
+        service.getAnnonces(localisation, prixMin, prixMax, null, null, null).enqueue(new Callback<AnnonceListResponse>() {
             @Override
             public void onResponse(@NonNull Call<AnnonceListResponse> call, @NonNull Response<AnnonceListResponse> response) {
                 progressBar.setVisibility(View.GONE);
@@ -207,5 +254,69 @@ public class ListingsActivity extends AppCompatActivity {
                 itemView.getContext().startActivity(intent);
             });
         }
+    }
+
+    private void applyFilters() {
+        // Récupérer les valeurs des champs
+        String localisation = etLocalisation != null ? etLocalisation.getText().toString().trim() : "";
+        String prixMin = etPrixMin != null ? etPrixMin.getText().toString().trim() : "";
+        String prixMax = etPrixMax != null ? etPrixMax.getText().toString().trim() : "";
+
+        // Convertir les chaînes vides en null
+        localisation = localisation.isEmpty() ? null : localisation;
+        prixMin = prixMin.isEmpty() ? null : prixMin;
+        prixMax = prixMax.isEmpty() ? null : prixMax;
+
+        // Validation basique des prix
+        if (prixMin != null && prixMax != null) {
+            try {
+                double min = Double.parseDouble(prixMin);
+                double max = Double.parseDouble(prixMax);
+                if (min > max) {
+                    android.widget.Toast.makeText(this, "Le prix minimum ne peut pas être supérieur au prix maximum", android.widget.Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                android.widget.Toast.makeText(this, "Veuillez entrer des prix valides", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        // Mettre à jour les filtres actuels
+        currentLocalisation = localisation;
+        currentPrixMin = prixMin;
+        currentPrixMax = prixMax;
+
+        // Recharger les annonces avec les nouveaux filtres
+        loadAnnonces();
+
+        // Masquer le clavier
+        android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+        if (imm != null && getCurrentFocus() != null) {
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
+    private void clearFilters() {
+        // Vider tous les champs
+        if (etLocalisation != null) etLocalisation.setText("");
+        if (etPrixMin != null) etPrixMin.setText("");
+        if (etPrixMax != null) etPrixMax.setText("");
+
+        // Réinitialiser les filtres actuels
+        currentLocalisation = null;
+        currentPrixMin = null;
+        currentPrixMax = null;
+
+        // Recharger toutes les annonces
+        loadAnnonces();
+
+        // Masquer le clavier
+        android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+        if (imm != null && getCurrentFocus() != null) {
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+
+        android.widget.Toast.makeText(this, "Filtres effacés", android.widget.Toast.LENGTH_SHORT).show();
     }
 }

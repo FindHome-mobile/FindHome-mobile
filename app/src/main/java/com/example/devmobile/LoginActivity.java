@@ -45,6 +45,9 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
+            // Initialisation du contexte pour Retrofit
+            RetrofitClient.setContext(this);
+
             // Initialisation de Retrofit
             try {
                 authService = RetrofitClient.getInstance().getAuthService();

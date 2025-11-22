@@ -122,6 +122,45 @@
                     android:gravity="end"/>
             </LinearLayout>
 
+            <!-- Boutons d'action (visibles seulement dans Mes annonces) -->
+            <LinearLayout
+                android:id="@+id/layout_actions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:visibility="gone">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_edit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="Modifier"
+                    android:textColor="?attr/colorOnPrimary"
+                    app:backgroundTint="?attr/colorPrimary"
+                    app:icon="@android:drawable/ic_menu_edit"
+                    app:iconTint="?attr/colorOnPrimary"
+                    style="@style/Widget.Material3.Button.Icon"
+                    app:iconGravity="textStart" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_delete"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Supprimer"
+                    android:textColor="?attr/colorOnError"
+                    app:backgroundTint="?attr/colorError"
+                    app:icon="@android:drawable/ic_menu_delete"
+                    app:iconTint="?attr/colorOnError"
+                    style="@style/Widget.Material3.Button.Icon"
+                    app:iconGravity="textStart" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

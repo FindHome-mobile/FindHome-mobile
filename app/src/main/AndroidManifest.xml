@@ -52,6 +52,13 @@
             android:name="com.example.devmobile.CreateAnnonceActivity"
             android:exported="false" />
 
+        <activity
+            android:name="com.example.devmobile.FavoritesActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="com.example.devmobile.MyAnnoncesActivity"
+            android:exported="false" />
 
     </application>
 
