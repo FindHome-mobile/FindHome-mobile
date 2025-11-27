@@ -96,7 +96,7 @@ public class AnnonceDetailActivity extends AppCompatActivity {
         btnFavorite = findViewById(R.id.btn_favorite);
 
         btnCall.setOnClickListener(v -> makePhoneCall());
-        btnEmail.setOnClickListener(v -> sendEmail());
+        btnEmail.setOnClickListener(v -> sendWhatsAppMessage());
         btnFavorite.setOnClickListener(v -> toggleFavorite());
     }
 
@@ -116,7 +116,8 @@ public class AnnonceDetailActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<Annonce> call, @NonNull Throwable t) {
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(AnnonceDetailActivity.this, "Erreur réseau: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AnnonceDetailActivity.this, "Erreur réseau: " + t.getMessage(), Toast.LENGTH_SHORT)
+                        .show();
             }
         });
     }
@@ -176,8 +177,9 @@ public class AnnonceDetailActivity extends AppCompatActivity {
             return;
         }
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE}, 100);
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CALL_PHONE }, 100);
             return;
         }
 
@@ -186,25 +188,73 @@ public class AnnonceDetailActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void sendEmail() {
-        String email = tvProprietaireEmail.getText().toString();
-        if (TextUtils.isEmpty(email)) {
-            Toast.makeText(this, "Email non disponible", Toast.LENGTH_SHORT).show();
+    private void sendWhatsAppMessage() {
+        String phone = tvTelephone.getText().toString();
+        if (TextUtils.isEmpty(phone)) {
+            Toast.makeText(this, "Numéro de téléphone non disponible", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Intent intent = new Intent(Intent.ACTION_SENDTO);
-        intent.setData(Uri.parse("mailto:" + email));
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Demande d'information - " + tvTitle.getText().toString());
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        } else {
-            Toast.makeText(this, "Aucune application email disponible", Toast.LENGTH_SHORT).show();
+        // Nettoyer le numéro de téléphone (enlever les espaces et autres caractères)
+        String cleanPhone = phone.replaceAll("[^0-9+]", "");
+
+        // Si le numéro ne commence pas par +, ajouter le code pays tunisien
+        if (!cleanPhone.startsWith("+")) {
+            // Si le numéro commence par 00, le remplacer par +
+            if (cleanPhone.startsWith("00")) {
+                cleanPhone = "+" + cleanPhone.substring(2);
+            }
+            // Si le numéro commence par 216 (code Tunisie), ajouter +
+            else if (cleanPhone.startsWith("216")) {
+                cleanPhone = "+" + cleanPhone;
+            }
+            // Sinon, ajouter +216 (code pays Tunisie)
+            else {
+                cleanPhone = "+216" + cleanPhone;
+            }
+        }
+
+        // Message professionnel par défaut
+        String message = "Bonjour, je suis intéressé(e) par votre annonce \"" + tvTitle.getText().toString() +
+                "\". Pourriez-vous me donner plus d'informations ? Merci.";
+
+        try {
+            // Créer l'URI WhatsApp
+            String url = "https://api.whatsapp.com/send?phone=" + cleanPhone + "&text=" + Uri.encode(message);
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(url));
+
+            // Vérifier si une application peut gérer cet intent
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(intent);
+            } else {
+                Toast.makeText(this,
+                        "WhatsApp n'est pas installé sur cet appareil. Veuillez installer WhatsApp pour contacter l'annonceur.",
+                        Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            Log.e("AnnonceDetailActivity", "Erreur lors de l'ouverture de WhatsApp: " + e.getMessage());
+            Toast.makeText(this, "Erreur lors de l'ouverture de WhatsApp. Veuillez réessayer.", Toast.LENGTH_LONG)
+                    .show();
+        }
+    }
+
+    /**
+     * Vérifie si une application est installée
+     */
+    private boolean isAppInstalled(String packageName) {
+        try {
+            getPackageManager().getPackageInfo(packageName, 0);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 
     private void checkFavorite() {
-        if (TextUtils.isEmpty(clientId)) return;
+        if (TextUtils.isEmpty(clientId))
+            return;
 
         favoriService.checkIfFavorite(clientId, annonceId).enqueue(new Callback<JsonObject>() {
             @Override
@@ -236,7 +286,8 @@ public class AnnonceDetailActivity extends AppCompatActivity {
     }
 
     private void addFavorite() {
-        Log.d("AnnonceDetailActivity", "Tentative d'ajout aux favoris - clientId: " + clientId + ", annonceId: " + annonceId);
+        Log.d("AnnonceDetailActivity",
+                "Tentative d'ajout aux favoris - clientId: " + clientId + ", annonceId: " + annonceId);
 
         JsonObject body = new JsonObject();
         body.addProperty("clientId", clientId);
@@ -276,7 +327,8 @@ public class AnnonceDetailActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
                 Log.e("AnnonceDetailActivity", "Erreur réseau ajout favori: " + t.getMessage(), t);
-                Toast.makeText(AnnonceDetailActivity.this, "Erreur réseau: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AnnonceDetailActivity.this, "Erreur réseau: " + t.getMessage(), Toast.LENGTH_SHORT)
+                        .show();
             }
         });
     }
@@ -296,7 +348,8 @@ public class AnnonceDetailActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
-                Toast.makeText(AnnonceDetailActivity.this, "Erreur réseau: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AnnonceDetailActivity.this, "Erreur réseau: " + t.getMessage(), Toast.LENGTH_SHORT)
+                        .show();
             }
         });
     }
@@ -304,9 +357,7 @@ public class AnnonceDetailActivity extends AppCompatActivity {
     private void updateFavoriteButton() {
         if (btnFavorite instanceof android.widget.ImageButton) {
             ((android.widget.ImageButton) btnFavorite).setImageResource(
-                isFavorite ? android.R.drawable.star_big_on : android.R.drawable.star_big_off
-            );
+                    isFavorite ? android.R.drawable.star_big_on : android.R.drawable.star_big_off);
         }
     }
 }
-

@@ -144,6 +144,9 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
 
             // Configurer le RecyclerView pour les annonces avec espacement et animations
             rvAnnonces.setLayoutManager(new LinearLayoutManager(this));
+            rvAnnonces.setHasFixedSize(false); // Important: permet au RecyclerView de mesurer correctement les items
+            rvAnnonces.setNestedScrollingEnabled(true); // Active le scroll fluide
+
             annoncesAdapter = new AnnoncesAdapter();
             rvAnnonces.setAdapter(annoncesAdapter);
 
@@ -328,14 +331,17 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         private final List<Annonce> items = new ArrayList<>();
 
         void setItems(List<Annonce> newItems) {
+            Log.d("DashboardAdapter", "setItems appelé avec " + newItems.size() + " annonces");
             items.clear();
             items.addAll(newItems);
+            Log.d("DashboardAdapter", "items.size() après ajout: " + items.size());
             notifyDataSetChanged();
         }
 
         @NonNull
         @Override
         public AnnonceVH onCreateViewHolder(@NonNull android.view.ViewGroup parent, int viewType) {
+            Log.d("DashboardAdapter", "onCreateViewHolder appelé");
             android.view.View view = android.view.LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_annonce, parent, false);
             return new AnnonceVH(view);
@@ -343,12 +349,15 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
 
         @Override
         public void onBindViewHolder(@NonNull AnnonceVH holder, int position) {
+            Log.d("DashboardAdapter", "onBindViewHolder appelé pour position: " + position);
             holder.bind(items.get(position));
         }
 
         @Override
         public int getItemCount() {
-            return items.size();
+            int count = items.size();
+            Log.d("DashboardAdapter", "getItemCount retourne: " + count);
+            return count;
         }
     }
 

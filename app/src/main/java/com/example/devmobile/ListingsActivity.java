@@ -77,7 +77,11 @@ public class ListingsActivity extends AppCompatActivity {
         btnFilter = findViewById(R.id.btn_filter);
         btnClearFilters = findViewById(R.id.btn_clear_filters);
 
+        // Configurer le RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(false); // Important: permet au RecyclerView de mesurer correctement les items
+        recyclerView.setNestedScrollingEnabled(true); // Active le scroll
+
         adapter = new AnnoncesAdapter();
         recyclerView.setAdapter(adapter);
 
@@ -89,7 +93,8 @@ public class ListingsActivity extends AppCompatActivity {
             btnClearFilters.setOnClickListener(v -> clearFilters());
         }
 
-        // TODO: Ajouter la fonctionnalité de recherche avec la touche Entrée si souhaité
+        // TODO: Ajouter la fonctionnalité de recherche avec la touche Entrée si
+        // souhaité
 
         loadAnnonces();
     }
@@ -117,77 +122,90 @@ public class ListingsActivity extends AppCompatActivity {
         android.util.Log.d("ListingsActivity", "RetrofitClient.getInstance réussi");
         AnnonceService service = client.getAnnonceService();
         android.util.Log.d("ListingsActivity", "AnnonceService créé");
-        Log.d("ListingsActivity", "Chargement des annonces avec filtres - localisation: " + localisation + ", prixMin: " + prixMin + ", prixMax: " + prixMax);
-        service.getAnnonces(localisation, prixMin, prixMax, null, null, null).enqueue(new Callback<AnnonceListResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<AnnonceListResponse> call, @NonNull Response<AnnonceListResponse> response) {
-                progressBar.setVisibility(View.GONE);
-                Log.d("ListingsActivity", "Réponse reçue: " + response.code());
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Annonce> list = response.body().getAnnonces();
-                    if (list == null) list = new ArrayList<>();
-                    Log.d("ListingsActivity", "Nombre d'annonces: " + list.size());
-                    adapter.setItems(list);
-                    recyclerView.setVisibility(list.isEmpty() ? View.GONE : View.VISIBLE);
-                    tvEmpty.setVisibility(list.isEmpty() ? View.VISIBLE : View.GONE);
-                } else {
-                    recyclerView.setVisibility(View.GONE);
-                    tvEmpty.setVisibility(View.VISIBLE);
-                    String errorMsg = "Impossible de charger les annonces (" + response.code() + ")";
-                    try {
-                        if (response.errorBody() != null) {
-                            String errorBody = response.errorBody().string();
-                            Log.e("ListingsActivity", "Erreur body: " + errorBody);
-                            if (errorBody.contains("\"message\"")) {
-                                int start = errorBody.indexOf("\"message\"");
-                                if (start != -1) {
-                                    int msgStart = errorBody.indexOf("\"", start + 10) + 1;
-                                    int msgEnd = errorBody.indexOf("\"", msgStart);
-                                    if (msgEnd > msgStart) {
-                                        errorMsg = errorBody.substring(msgStart, msgEnd);
+        Log.d("ListingsActivity", "Chargement des annonces avec filtres - localisation: " + localisation + ", prixMin: "
+                + prixMin + ", prixMax: " + prixMax);
+        service.getAnnonces(localisation, prixMin, prixMax, null, null, null)
+                .enqueue(new Callback<AnnonceListResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<AnnonceListResponse> call,
+                            @NonNull Response<AnnonceListResponse> response) {
+                        progressBar.setVisibility(View.GONE);
+                        Log.d("ListingsActivity", "Réponse reçue: " + response.code());
+                        if (response.isSuccessful() && response.body() != null) {
+                            List<Annonce> list = response.body().getAnnonces();
+                            if (list == null)
+                                list = new ArrayList<>();
+                            Log.d("ListingsActivity", "Nombre d'annonces: " + list.size());
+                            adapter.setItems(list);
+                            recyclerView.setVisibility(list.isEmpty() ? View.GONE : View.VISIBLE);
+                            tvEmpty.setVisibility(list.isEmpty() ? View.VISIBLE : View.GONE);
+                        } else {
+                            recyclerView.setVisibility(View.GONE);
+                            tvEmpty.setVisibility(View.VISIBLE);
+                            String errorMsg = "Impossible de charger les annonces (" + response.code() + ")";
+                            try {
+                                if (response.errorBody() != null) {
+                                    String errorBody = response.errorBody().string();
+                                    Log.e("ListingsActivity", "Erreur body: " + errorBody);
+                                    if (errorBody.contains("\"message\"")) {
+                                        int start = errorBody.indexOf("\"message\"");
+                                        if (start != -1) {
+                                            int msgStart = errorBody.indexOf("\"", start + 10) + 1;
+                                            int msgEnd = errorBody.indexOf("\"", msgStart);
+                                            if (msgEnd > msgStart) {
+                                                errorMsg = errorBody.substring(msgStart, msgEnd);
+                                            }
+                                        }
                                     }
                                 }
+                            } catch (Exception e) {
+                                Log.e("ListingsActivity", "Erreur parsing: " + e.getMessage());
                             }
                         }
-                    } catch (Exception e) {
-                        Log.e("ListingsActivity", "Erreur parsing: " + e.getMessage());
                     }
-                }
-            }
 
-            @Override
-            public void onFailure(@NonNull Call<AnnonceListResponse> call, @NonNull Throwable t) {
-                progressBar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.GONE);
-                tvEmpty.setVisibility(View.VISIBLE);
-                Log.e("ListingsActivity", "Erreur réseau: " + t.getMessage(), t);
-            }
-        });
+                    @Override
+                    public void onFailure(@NonNull Call<AnnonceListResponse> call, @NonNull Throwable t) {
+                        progressBar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.GONE);
+                        tvEmpty.setVisibility(View.VISIBLE);
+                        Log.e("ListingsActivity", "Erreur réseau: " + t.getMessage(), t);
+                    }
+                });
     }
 
     private static class AnnoncesAdapter extends RecyclerView.Adapter<AnnonceVH> {
         private final List<Annonce> items = new ArrayList<>();
 
         void setItems(List<Annonce> newItems) {
+            Log.d("AnnoncesAdapter", "setItems appelé avec " + newItems.size() + " annonces");
             items.clear();
             items.addAll(newItems);
+            Log.d("AnnoncesAdapter", "items.size() après ajout: " + items.size());
             notifyDataSetChanged();
         }
 
         @NonNull
         @Override
         public AnnonceVH onCreateViewHolder(@NonNull android.view.ViewGroup parent, int viewType) {
-            android.view.View view = android.view.LayoutInflater.from(parent.getContext()).inflate(R.layout.item_annonce, parent, false);
+            Log.d("AnnoncesAdapter", "onCreateViewHolder appelé");
+            android.view.View view = android.view.LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_annonce, parent, false);
             return new AnnonceVH(view);
         }
 
         @Override
         public void onBindViewHolder(@NonNull AnnonceVH holder, int position) {
+            Log.d("AnnoncesAdapter", "onBindViewHolder appelé pour position: " + position);
             holder.bind(items.get(position));
         }
 
         @Override
-        public int getItemCount() { return items.size(); }
+        public int getItemCount() {
+            int count = items.size();
+            Log.d("AnnoncesAdapter", "getItemCount retourne: " + count);
+            return count;
+        }
     }
 
     private static class AnnonceVH extends RecyclerView.ViewHolder {
@@ -209,21 +227,21 @@ public class ListingsActivity extends AppCompatActivity {
             tvTitle.setText(a.getTitre());
             String sub = (a.getLocalisation() != null ? a.getLocalisation() : "");
             tvSubtitle.setText(sub);
-            
+
             String typeBien = a.getTypeBien() != null ? a.getTypeBien() : "";
-            
+
             if (tvTypeBien != null) {
                 tvTypeBien.setText(typeBien);
             }
-            
+
             if (chipType != null) {
                 chipType.setText(typeBien);
             }
-            
+
             if (tvPrix != null) {
                 tvPrix.setText(String.format("%.0f DT", a.getPrix()));
             }
-            
+
             // Charger l'image si disponible
             if (ivImage != null && a.getImages() != null && !a.getImages().isEmpty()) {
                 String firstImage = a.getImages().get(0);
@@ -232,7 +250,8 @@ public class ListingsActivity extends AppCompatActivity {
                         try {
                             String base64Image = firstImage.substring(firstImage.indexOf(",") + 1);
                             byte[] decodedBytes = android.util.Base64.decode(base64Image, android.util.Base64.DEFAULT);
-                            android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                            android.graphics.Bitmap bitmap = android.graphics.BitmapFactory
+                                    .decodeByteArray(decodedBytes, 0, decodedBytes.length);
                             ivImage.setImageBitmap(bitmap);
                         } catch (Exception e) {
                             android.util.Log.e("ListingsActivity", "Erreur chargement image", e);
@@ -247,9 +266,10 @@ public class ListingsActivity extends AppCompatActivity {
             } else if (ivImage != null) {
                 ivImage.setImageResource(android.R.drawable.ic_menu_gallery);
             }
-            
+
             itemView.setOnClickListener(v -> {
-                android.content.Intent intent = new android.content.Intent(itemView.getContext(), AnnonceDetailActivity.class);
+                android.content.Intent intent = new android.content.Intent(itemView.getContext(),
+                        AnnonceDetailActivity.class);
                 intent.putExtra("annonceId", a.getId());
                 itemView.getContext().startActivity(intent);
             });
@@ -273,11 +293,13 @@ public class ListingsActivity extends AppCompatActivity {
                 double min = Double.parseDouble(prixMin);
                 double max = Double.parseDouble(prixMax);
                 if (min > max) {
-                    android.widget.Toast.makeText(this, "Le prix minimum ne peut pas être supérieur au prix maximum", android.widget.Toast.LENGTH_SHORT).show();
+                    android.widget.Toast.makeText(this, "Le prix minimum ne peut pas être supérieur au prix maximum",
+                            android.widget.Toast.LENGTH_SHORT).show();
                     return;
                 }
             } catch (NumberFormatException e) {
-                android.widget.Toast.makeText(this, "Veuillez entrer des prix valides", android.widget.Toast.LENGTH_SHORT).show();
+                android.widget.Toast
+                        .makeText(this, "Veuillez entrer des prix valides", android.widget.Toast.LENGTH_SHORT).show();
                 return;
             }
         }
@@ -291,7 +313,8 @@ public class ListingsActivity extends AppCompatActivity {
         loadAnnonces();
 
         // Masquer le clavier
-        android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+        android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(
+                android.content.Context.INPUT_METHOD_SERVICE);
         if (imm != null && getCurrentFocus() != null) {
             imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
@@ -299,9 +322,12 @@ public class ListingsActivity extends AppCompatActivity {
 
     private void clearFilters() {
         // Vider tous les champs
-        if (etLocalisation != null) etLocalisation.setText("");
-        if (etPrixMin != null) etPrixMin.setText("");
-        if (etPrixMax != null) etPrixMax.setText("");
+        if (etLocalisation != null)
+            etLocalisation.setText("");
+        if (etPrixMin != null)
+            etPrixMin.setText("");
+        if (etPrixMax != null)
+            etPrixMax.setText("");
 
         // Réinitialiser les filtres actuels
         currentLocalisation = null;
@@ -312,7 +338,8 @@ public class ListingsActivity extends AppCompatActivity {
         loadAnnonces();
 
         // Masquer le clavier
-        android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+        android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(
+                android.content.Context.INPUT_METHOD_SERVICE);
         if (imm != null && getCurrentFocus() != null) {
             imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
