@@ -243,7 +243,7 @@ public class CreateAnnonceActivity extends AppCompatActivity {
         if (etSurface != null)
             etSurface.setText(String.valueOf(annonce.getSurface()));
         if (etTypeBien != null)
-            etTypeBien.setText(annonce.getTypeBien(), false); // false pour ne pas filtrer
+            etTypeBien.setText(formatTypeBienForDisplay(annonce.getTypeBien()), false); // false pour ne pas filtrer
         if (etTelephone != null)
             etTelephone.setText(annonce.getTelephone());
 
@@ -340,7 +340,7 @@ public class CreateAnnonceActivity extends AppCompatActivity {
         String prix = etPrix.getText().toString().trim();
         String nbPieces = etNbPieces.getText().toString().trim();
         String surface = etSurface.getText().toString().trim();
-        String typeBien = etTypeBien.getText().toString().trim();
+        String typeBien = etTypeBien.getText().toString().trim().toLowerCase();
 
         // Vérifier que le champ téléphone est initialisé et lire sa valeur
         String telephone = "";
@@ -738,6 +738,16 @@ public class CreateAnnonceActivity extends AppCompatActivity {
             throw e;
         }
         return buffer.toByteArray();
+    }
+
+    /**
+     * Formate le type de bien pour l'affichage (première lettre en majuscule)
+     */
+    private String formatTypeBienForDisplay(String typeBien) {
+        if (typeBien == null || typeBien.isEmpty()) {
+            return typeBien;
+        }
+        return typeBien.substring(0, 1).toUpperCase() + typeBien.substring(1).toLowerCase();
     }
 
     private class SelectedImagesAdapter extends RecyclerView.Adapter<ImageVH> {

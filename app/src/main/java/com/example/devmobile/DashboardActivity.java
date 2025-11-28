@@ -144,6 +144,9 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
 
             // Configurer le RecyclerView pour les annonces avec espacement et animations
             rvAnnonces.setLayoutManager(new LinearLayoutManager(this));
+            rvAnnonces.setHasFixedSize(false); // Important: permet au RecyclerView de mesurer correctement les items
+            rvAnnonces.setNestedScrollingEnabled(true); // Active le scroll fluide
+
             annoncesAdapter = new AnnoncesAdapter();
             rvAnnonces.setAdapter(annoncesAdapter);
 
@@ -235,6 +238,9 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
 
             // Charger les annonces directement dans le Dashboard
             loadAnnoncesInDashboard();
+
+            // Charger le nombre de favoris
+            loadFavoritesCount();
         } catch (Exception e) {
             Log.e("DashboardActivity", "Erreur critique dans onCreate", e);
             Toast.makeText(this, "Erreur au démarrage: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -324,18 +330,66 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         });
     }
 
+    private void loadFavoritesCount() {
+        SharedPreferences prefs = getSharedPreferences("AuthPrefs", MODE_PRIVATE);
+        String userId = prefs.getString("USER_ID", null);
+
+        if (userId == null || userId.isEmpty()) {
+            Log.w("DashboardActivity", "Impossible de charger les favoris: userId null");
+            return;
+        }
+
+        FavoriService favoriService = RetrofitClient.getInstance().getFavoriService();
+        favoriService.getFavoritesCount(userId).enqueue(new Callback<com.google.gson.JsonObject>() {
+            @Override
+            public void onResponse(@NonNull Call<com.google.gson.JsonObject> call,
+                    @NonNull Response<com.google.gson.JsonObject> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        int count = response.body().get("count").getAsInt();
+                        Log.d("DashboardActivity", "Nombre de favoris: " + count);
+                        if (tvStatsFavoris != null) {
+                            tvStatsFavoris.setText(String.valueOf(count));
+                        }
+                    } catch (Exception e) {
+                        Log.e("DashboardActivity", "Erreur parsing count favoris", e);
+                        if (tvStatsFavoris != null) {
+                            tvStatsFavoris.setText("0");
+                        }
+                    }
+                } else {
+                    Log.w("DashboardActivity", "Réponse favoris non réussie: " + response.code());
+                    if (tvStatsFavoris != null) {
+                        tvStatsFavoris.setText("0");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<com.google.gson.JsonObject> call, @NonNull Throwable t) {
+                Log.e("DashboardActivity", "Erreur chargement favoris: " + t.getMessage(), t);
+                if (tvStatsFavoris != null) {
+                    tvStatsFavoris.setText("0");
+                }
+            }
+        });
+    }
+
     private class AnnoncesAdapter extends RecyclerView.Adapter<AnnonceVH> {
         private final List<Annonce> items = new ArrayList<>();
 
         void setItems(List<Annonce> newItems) {
+            Log.d("DashboardAdapter", "setItems appelé avec " + newItems.size() + " annonces");
             items.clear();
             items.addAll(newItems);
+            Log.d("DashboardAdapter", "items.size() après ajout: " + items.size());
             notifyDataSetChanged();
         }
 
         @NonNull
         @Override
         public AnnonceVH onCreateViewHolder(@NonNull android.view.ViewGroup parent, int viewType) {
+            Log.d("DashboardAdapter", "onCreateViewHolder appelé");
             android.view.View view = android.view.LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_annonce, parent, false);
             return new AnnonceVH(view);
@@ -343,12 +397,15 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
 
         @Override
         public void onBindViewHolder(@NonNull AnnonceVH holder, int position) {
+            Log.d("DashboardAdapter", "onBindViewHolder appelé pour position: " + position);
             holder.bind(items.get(position));
         }
 
         @Override
         public int getItemCount() {
-            return items.size();
+            int count = items.size();
+            Log.d("DashboardAdapter", "getItemCount retourne: " + count);
+            return count;
         }
     }
 
