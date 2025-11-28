@@ -16,6 +16,7 @@ public class RetrofitClient {
 
     // L'URL de base de votre backend (Express/Node.js)
     // **METTEZ À JOUR CETTE URL** (Utilisez l'adresse IP locale de votre machine + le port, ex: http://192.168.1.5:3000/api/)
+    //172.20.10.2
     private static final String BASE_URL = "http://172.20.10.2:5000/api/"; // Adresse IP réseau locale pour téléphone réel
 
     private static RetrofitClient instance;

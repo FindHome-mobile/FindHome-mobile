@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <!-- Déclaration des packages pour Android 11+ -->
     <queries>
-        <!-- WhatsApp -->
         <package android:name="com.whatsapp" />
-        <!-- WhatsApp Business -->
         <package android:name="com.whatsapp.w4b" />
     </queries>
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -36,43 +30,32 @@
         <activity
             android:name="com.example.devmobile.LoginActivity"
             android:exported="false" />
-
         <activity
             android:name="com.example.devmobile.RegisterActivity"
             android:exported="false" />
-
         <activity
             android:name="com.example.devmobile.DashboardActivity"
             android:exported="false" />
-
         <activity
             android:name="com.example.devmobile.ProfileActivity"
             android:exported="false" />
-
         <activity
             android:name="com.example.devmobile.ListingsActivity"
             android:exported="false" />
-
         <activity
             android:name="com.example.devmobile.AdminActivity"
             android:exported="false" />
-
         <activity
             android:name="com.example.devmobile.AnnonceDetailActivity"
             android:exported="false" />
-
         <activity
             android:name="com.example.devmobile.CreateAnnonceActivity"
             android:exported="false" />
-
         <activity
             android:name="com.example.devmobile.FavoritesActivity"
             android:exported="false" />
-
         <activity
             android:name="com.example.devmobile.MyAnnoncesActivity"
             android:exported="false" />
-
     </application>
-
 </manifest>

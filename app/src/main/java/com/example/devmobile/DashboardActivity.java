@@ -238,6 +238,9 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
 
             // Charger les annonces directement dans le Dashboard
             loadAnnoncesInDashboard();
+
+            // Charger le nombre de favoris
+            loadFavoritesCount();
         } catch (Exception e) {
             Log.e("DashboardActivity", "Erreur critique dans onCreate", e);
             Toast.makeText(this, "Erreur au démarrage: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -323,6 +326,51 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                     // layout
                 }
                 Log.e("DashboardActivity", "Erreur réseau: " + t.getMessage(), t);
+            }
+        });
+    }
+
+    private void loadFavoritesCount() {
+        SharedPreferences prefs = getSharedPreferences("AuthPrefs", MODE_PRIVATE);
+        String userId = prefs.getString("USER_ID", null);
+
+        if (userId == null || userId.isEmpty()) {
+            Log.w("DashboardActivity", "Impossible de charger les favoris: userId null");
+            return;
+        }
+
+        FavoriService favoriService = RetrofitClient.getInstance().getFavoriService();
+        favoriService.getFavoritesCount(userId).enqueue(new Callback<com.google.gson.JsonObject>() {
+            @Override
+            public void onResponse(@NonNull Call<com.google.gson.JsonObject> call,
+                    @NonNull Response<com.google.gson.JsonObject> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        int count = response.body().get("count").getAsInt();
+                        Log.d("DashboardActivity", "Nombre de favoris: " + count);
+                        if (tvStatsFavoris != null) {
+                            tvStatsFavoris.setText(String.valueOf(count));
+                        }
+                    } catch (Exception e) {
+                        Log.e("DashboardActivity", "Erreur parsing count favoris", e);
+                        if (tvStatsFavoris != null) {
+                            tvStatsFavoris.setText("0");
+                        }
+                    }
+                } else {
+                    Log.w("DashboardActivity", "Réponse favoris non réussie: " + response.code());
+                    if (tvStatsFavoris != null) {
+                        tvStatsFavoris.setText("0");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<com.google.gson.JsonObject> call, @NonNull Throwable t) {
+                Log.e("DashboardActivity", "Erreur chargement favoris: " + t.getMessage(), t);
+                if (tvStatsFavoris != null) {
+                    tvStatsFavoris.setText("0");
+                }
             }
         });
     }
